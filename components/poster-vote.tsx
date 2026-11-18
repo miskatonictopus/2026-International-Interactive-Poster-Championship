@@ -1,8 +1,9 @@
 "use client"
 
-import { type FormEvent, useEffect, useState } from "react"
+import { type FormEvent, useContext, useEffect, useState } from "react"
 
 import { cn } from "@/lib/utils"
+import { LiveVoteTotals } from "./live-vote-totals"
 
 type VoteSummary = { total: number; points: number; rating: number | null }
 
@@ -20,6 +21,7 @@ export function PosterVote({
 }) {
   const endpoint = `/api/proyectos/${encodeURIComponent(poster)}/votos`
   const [summary, setSummary] = useState<VoteSummary | null>(null)
+  const liveTotals = useContext(LiveVoteTotals)[poster] ?? summary
   const [draftRating, setDraftRating] = useState<number | null>(null)
   const [hover, setHover] = useState<number | null>(null)
   const [saving, setSaving] = useState(false)
@@ -60,7 +62,6 @@ export function PosterVote({
       if (response.status === 409) setSummary(null)
       if (!response.ok) throw new Error("No se pudo guardar el voto")
       const { rating }: VoteSummary = await response.json()
-      // Los contadores reflejan la última carga de la página.
       setSummary((loaded) => loaded && { ...loaded, rating })
       setSubmitted(true)
     } catch {
@@ -73,13 +74,13 @@ export function PosterVote({
   const highlighted = hover ?? selected
   const totals = [
     {
-      value: summary?.points,
+      value: liveTotals?.points,
       format: pointsFormat,
       singular: "punto",
       plural: "puntos",
     },
     {
-      value: summary?.total,
+      value: liveTotals?.total,
       format: votesFormat,
       singular: "voto",
       plural: "votos",
