@@ -77,18 +77,20 @@ export function PosterVote({
 
   return (
     <form onSubmit={submitVote}>
-      <div className="flex items-stretch justify-between gap-2 leading-none">
+      <div className="flex items-stretch justify-between gap-[2.5cqw] leading-none">
         <div className="flex flex-col justify-between">
-          <span className="text-[2.5rem] leading-[0.8] font-black tracking-[-0.06em] tabular-nums">
+          <span className="text-[length:12cqw] leading-[0.8] font-black tracking-[-0.06em] tabular-nums">
             {String(number).padStart(2, "0")}
           </span>
-          <span className="mt-2 text-[11px] uppercase">Poster</span>
+          <span className="mt-[2.5cqw] text-[length:2.8cqw] uppercase">
+            Poster
+          </span>
         </div>
         <div className="flex flex-col items-center justify-between">
           <div
             role="group"
             aria-label={`Valorar el póster de ${author}`}
-            className="flex gap-0.5"
+            className="flex gap-[0.6cqw]"
             onPointerLeave={() => setHover(null)}
           >
             {[1, 2, 3, 4, 5].map((rating) => (
@@ -99,7 +101,7 @@ export function PosterVote({
                 aria-pressed={rating === selected}
                 disabled={!summary}
                 aria-disabled={saving || undefined}
-                className="flex w-5 flex-col items-center gap-0.5 rounded-sm focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-neutral-950 enabled:cursor-pointer"
+                className="flex w-[6cqw] flex-col items-center gap-[0.6cqw] rounded-sm focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-neutral-950 enabled:cursor-pointer"
                 onPointerEnter={(event) => {
                   if (event.pointerType !== "touch") setHover(rating)
                 }}
@@ -110,20 +112,23 @@ export function PosterVote({
                   setError(false)
                 }}
               >
-                <span aria-hidden="true" className="text-[8px] font-bold">
+                <span
+                  aria-hidden="true"
+                  className="text-[length:2.5cqw] font-bold"
+                >
                   {rating}
                 </span>
                 <span
                   aria-hidden="true"
                   className={cn(
-                    "size-4 rounded-full border border-[#262626]",
+                    "size-[4.9cqw] rounded-full border border-[#262626]",
                     rating <= highlighted ? "bg-[#0a0a0a]" : "bg-transparent"
                   )}
                 />
               </button>
             ))}
           </div>
-          <span className="mt-2 text-[11px] whitespace-nowrap uppercase">
+          <span className="mt-[2.5cqw] text-[length:2.8cqw] whitespace-nowrap uppercase">
             Vota por este poster!
           </span>
         </div>
@@ -131,13 +136,13 @@ export function PosterVote({
           <button
             type="submit"
             disabled={!canSubmit}
-            className="h-[30px] w-full min-w-20 rounded-md bg-[#0a0a0a] px-2 text-[11px] font-semibold text-white uppercase focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-neutral-950 enabled:cursor-pointer disabled:opacity-45"
+            className="h-[9cqw] w-full min-w-[26cqw] rounded-[1.8cqw] bg-[#0a0a0a] px-[2cqw] text-[length:2.8cqw] font-semibold text-white uppercase focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-neutral-950 enabled:cursor-pointer disabled:opacity-45"
           >
             {saving ? "Enviando…" : "Enviar"}
           </button>
           <span
             role="status"
-            className="mt-2 text-[11px] whitespace-nowrap uppercase"
+            className="mt-[2.5cqw] text-[length:2.8cqw] whitespace-nowrap uppercase"
           >
             Total puntos:{" "}
             <strong className="tabular-nums">
