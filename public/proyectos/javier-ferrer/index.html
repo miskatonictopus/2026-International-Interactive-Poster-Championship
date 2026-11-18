@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cartel Itaca</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..900&display=swap">
+  <link rel="stylesheet" href="css/styles.css">
+  <script type="importmap">
+    { "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.187.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.187.0/examples/jsm/",
+      "meshoptimizer/simplifier": "https://cdn.jsdelivr.net/npm/meshoptimizer@0.22.0/meshopt_simplifier.module.js"
+    } }
+  </script>
+</head>
+<body>
+  <div class="cartel cartel--flying" id="cartel">
+    <!-- Juguetes flotando (adaptación de "flying bananas" de pmndrs, licencia MIT) -->
+    <canvas id="toys-canvas"></canvas>
+    <div id="status" role="status">Cargando juguetes…</div>
+    <!-- Capa delantera (sobre el cartel): aquí irán textos e imágenes -->
+    <div id="overlay">
+      <h1 class="overlay__title">loremi ispum</h1>
+    </div>
+  </div>
+
+  <script src="js/main.js"></script>
+  <script type="module" src="js/flying-toys.js"></script>
+</body>
+</html>

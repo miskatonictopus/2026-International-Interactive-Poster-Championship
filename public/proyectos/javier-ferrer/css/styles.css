@@ -1,0 +1,184 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0a0a0a;
+}
+
+.cartel {
+  position: relative;
+  width: 848px;
+  height: 1200px;
+  flex-shrink: 0;
+  background: #fff;
+  transform-origin: center center;
+  overflow: hidden;
+}
+
+/* ---- Efecto Fold ---- */
+
+.cartel canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+  cursor: grab;
+}
+.cartel canvas.grabbing { cursor: grabbing; }
+
+/* Capa del osito 3D: encima de todos los textos, deja pasar el ratón al tubo */
+.cartel #teddy-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+}
+
+#status {
+  position: absolute;
+  inset: 50% 20px auto;
+  text-align: center;
+  pointer-events: none;
+  color: #464741;
+  font: 11px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+/* Panel de ajustes (lil-gui), fijo en la esquina de la ventana */
+.lil-gui.root {
+  position: fixed;
+  top: 20px;
+  right: 28px;
+  max-width: calc(100vw - 32px);
+  max-height: calc(100dvh - 40px);
+  display: flex;
+  flex-direction: column;
+  --font-size: 11px;
+}
+.lil-gui.root > .title { flex-shrink: 0; }
+.lil-gui.root > .children {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* ---- Imagen "juguetes" ---- */
+
+.juguetes {
+  position: absolute;
+  left: 0;
+  width: 100%; /* todo el ancho del cartel (848px) */
+  height: auto;
+  top: calc(50% - 164px); /* centro vertical: alto 848 × 684/1771 ≈ 328px, la mitad = 164px */
+  pointer-events: none; /* deja arrastrar el tubo a través de la imagen */
+  visibility: hidden; /* aparece al caer */
+  transform-origin: 50% 100%; /* el aplastamiento del rebote apoya abajo */
+  will-change: transform;
+  z-index: 1;
+}
+
+/* ---- Imagen "sin" (encima de "juguetes") ---- */
+
+.sin {
+  position: absolute;
+  z-index: 3; /* por encima de "juguetes", "peque" y "ningún" */
+  width: 247px; /* 380 × 0,65 (un 35 % más pequeña) */
+  height: auto;
+  /* centrada sobre "juguetes" y desplazada a la derecha (--shift-x) */
+  --shift-x: 70px;
+  --shift-y: -135px; /* negativo = más arriba */
+  left: calc(50% - 123.5px + var(--shift-x)); /* 123,5 = mitad del ancho */
+  top: calc(50% - 85px + var(--shift-y)); /* 85 = mitad del alto (247 × 742/1075 ≈ 170) */
+  --rot: 0deg; /* rotación final extra (la imagen ya viene inclinada) */
+  pointer-events: none;
+  visibility: hidden;
+  transform-origin: 50% 100%;
+  will-change: transform;
+}
+
+/* ---- Imagen "peque" (entre "juguetes" y "sin", algo más arriba) ---- */
+
+.peque {
+  position: absolute;
+  z-index: 2; /* por encima de "juguetes", por debajo de "sin" */
+  width: 500px;
+  height: auto;
+  --shift-x: -20px;
+  --shift-y: -235px; /* negativo = más arriba */
+  left: calc(50% - 250px + var(--shift-x)); /* 250 = mitad del ancho */
+  top: calc(50% - 83px + var(--shift-y)); /* 83 = mitad del alto (500 × 397/1200 ≈ 165) */
+  --rot: -10deg; /* rotación hacia la izquierda */
+  pointer-events: none;
+  visibility: hidden;
+  transform-origin: 50% 100%;
+  will-change: transform;
+}
+
+/* ---- Imagen "ningún" (encima de "peque", tocando el borde derecho) ---- */
+
+.ningun {
+  position: absolute;
+  z-index: 2; /* encima de "peque" (mismo nivel, va después en el HTML), debajo de "sin" */
+  width: 420px;
+  height: auto;
+  /* Gira desde 0° (al empezar a caer) hasta 20° (al aterrizar). */
+  --rot-from: 0deg;
+  --rot: 20deg;
+  /* Girada 20°, su caja ocupa 420·cos20 + 189·sin20 ≈ 460px de ancho:
+     el centro a 230px del borde derecho hace que la esquina lo toque. */
+  left: calc(100% - 230px - 210px); /* 210 = mitad del ancho */
+  --shift-y: -345px; /* negativo = más arriba */
+  top: calc(50% - 95px + var(--shift-y)); /* 95 = mitad del alto (420 × 540/1200 ≈ 189) */
+  transform-origin: 50% 50%; /* gira sobre su centro para que el borde derecho quede exacto */
+  pointer-events: none;
+  visibility: hidden;
+  will-change: transform;
+}
+
+/* ---- Juguetes flotando (index.html) ---- */
+
+.cartel--flying { background: #fafafa; }
+.cartel #toys-canvas {
+  cursor: default;
+  touch-action: none;
+  opacity: 0;
+  transition: opacity 1.2s ease;
+}
+.cartel #toys-canvas.ready { opacity: 1; }
+.cartel #toys-canvas.over { cursor: grab; }
+.cartel #toys-canvas.grabbing { cursor: grabbing; }
+
+/* ---- Capa delantera (textos e imágenes) ---- */
+
+/* Ocupa exactamente el cartel (848×1200) y se escala con él */
+#overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Deja pasar el ratón a los juguetes (los elementos de dentro que deban
+     recibir clics llevarán pointer-events: auto) */
+  pointer-events: none;
+}
+
+.overlay__title {
+  font-family: 'Inter', sans-serif;
+  font-weight: 800;
+  font-size: 96px;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: #111;
+  text-align: center;
+}
