@@ -10,14 +10,15 @@ type VoteSummary = { total: number; points: number; rating: number | null }
 const pointsFormat = new Intl.NumberFormat("es-ES", {
   maximumFractionDigits: 2,
 })
-const votesFormat = new Intl.NumberFormat("es-ES", { maximumFractionDigits: 0 })
 
 export function PosterVote({
   poster,
   author,
+  number,
 }: {
   poster: string
   author: string
+  number: number
 }) {
   const endpoint = `/api/proyectos/${encodeURIComponent(poster)}/votos`
   const [summary, setSummary] = useState<VoteSummary | null>(null)
@@ -72,34 +73,24 @@ export function PosterVote({
   }
 
   const highlighted = hover ?? selected
-  const totals = [
-    {
-      value: liveTotals?.points,
-      format: pointsFormat,
-      singular: "punto",
-      plural: "puntos",
-    },
-    {
-      value: liveTotals?.total,
-      format: votesFormat,
-      singular: "voto",
-      plural: "votos",
-    },
-  ]
+  const points = liveTotals?.points
 
   return (
-    <form className="mt-2" onSubmit={submitVote}>
-      <div className="flex flex-wrap items-start gap-x-0.5 gap-y-1">
-        <div>
+    <form onSubmit={submitVote}>
+      <div className="flex items-stretch justify-between gap-2 leading-none">
+        <div className="flex flex-col justify-between">
+          <span className="text-[2.5rem] leading-[0.8] font-black tracking-[-0.06em] tabular-nums">
+            {String(number).padStart(2, "0")}
+          </span>
+          <span className="mt-2 text-[11px] uppercase">Poster</span>
+        </div>
+        <div className="flex flex-col items-center justify-between">
           <div
             role="group"
             aria-label={`Valorar el póster de ${author}`}
-            className="flex"
+            className="flex gap-0.5"
             onPointerLeave={() => setHover(null)}
           >
-            <span className="mr-1 flex h-7 shrink-0 items-center text-[11px] font-bold">
-              VOTA!
-            </span>
             {[1, 2, 3, 4, 5].map((rating) => (
               <button
                 key={rating}
@@ -108,7 +99,7 @@ export function PosterVote({
                 aria-pressed={rating === selected}
                 disabled={!summary}
                 aria-disabled={saving || undefined}
-                className="grid h-7 w-6 place-items-center rounded-sm focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-neutral-950 enabled:cursor-pointer"
+                className="flex w-5 flex-col items-center gap-0.5 rounded-sm focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-neutral-950 enabled:cursor-pointer"
                 onPointerEnter={(event) => {
                   if (event.pointerType !== "touch") setHover(rating)
                 }}
@@ -119,42 +110,53 @@ export function PosterVote({
                   setError(false)
                 }}
               >
+                <span aria-hidden="true" className="text-[8px] font-bold">
+                  {rating}
+                </span>
                 <span
                   aria-hidden="true"
                   className={cn(
-                    "size-[18px] rounded-full border border-[#262626]",
-                    rating <= highlighted
-                      ? "bg-red-600 shadow-[inset_2px_2px_4px_#26262655,inset_-1px_-1px_3px_#ffffff65]"
-                      : "bg-[#f5f5f5] shadow-[2px_2px_4px_#26262636,-2px_-2px_4px_#ffffff]"
+                    "size-4 rounded-full border border-[#262626]",
+                    rating <= highlighted ? "bg-[#0a0a0a]" : "bg-transparent"
                   )}
                 />
               </button>
             ))}
           </div>
+          <span className="mt-2 text-[11px] whitespace-nowrap uppercase">
+            Vota por este poster!
+          </span>
+        </div>
+        <div className="flex flex-col items-end justify-between">
           <button
             type="submit"
             disabled={!canSubmit}
-            className="mt-1 rounded-sm bg-[#0a0a0a] px-3 py-1.5 text-xs font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-neutral-950 enabled:cursor-pointer disabled:opacity-45"
+            className="h-[30px] w-full min-w-20 rounded-md bg-[#0a0a0a] px-2 text-[11px] font-semibold text-white uppercase focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-neutral-950 enabled:cursor-pointer disabled:opacity-45"
           >
-            {saving ? "Enviando…" : "Enviar voto"}
+            {saving ? "Enviando…" : "Enviar"}
           </button>
-        </div>
-        <div role="status" className="ml-auto flex gap-0.5 text-center">
-          {totals.map(({ value, format, singular, plural }) => (
-            <div key={plural} className="flex flex-col items-center gap-0.5">
-              <span className="grid aspect-square w-max min-w-7 place-items-center rounded-full bg-[#0a0a0a] px-1 font-sans text-base leading-none font-bold whitespace-nowrap text-white tabular-nums">
-                {value === undefined ? "—" : format.format(value)}
-              </span>
-              <span className="text-[10px] leading-tight text-neutral-700">
-                {value === 1 ? singular : plural}
-              </span>
-            </div>
-          ))}
+          <span
+            role="status"
+            className="mt-2 text-[11px] whitespace-nowrap uppercase"
+          >
+            Total puntos:{" "}
+            <strong className="tabular-nums">
+              {points === undefined
+                ? "—"
+                : points % 1 === 0
+                  ? String(points).padStart(5, "0")
+                  : pointsFormat.format(points)}
+            </strong>
+          </span>
         </div>
       </div>
       <p
         role="status"
-        className={submitted ? "mt-1 text-neutral-700" : "sr-only"}
+        className={
+          submitted
+            ? "mt-1 text-right font-bold tracking-[-0.02em] text-red-500"
+            : "sr-only"
+        }
       >
         {submitted ? "Voto guardado." : ""}
       </p>

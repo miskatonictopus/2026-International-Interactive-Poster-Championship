@@ -22,7 +22,7 @@ export default function Page() {
         <hr className="col-span-full border-t border-[#0a0a0a]" />
         <LiveVoteTotalsProvider>
           <div className="col-span-full grid grid-cols-12 gap-6">
-            {posters.map(({ id, author, course }) => (
+            {posters.map(({ id, author }, index) => (
               <figure key={id} className="col-span-12 md:col-span-3">
                 <div className="bg-white p-[10px] shadow-sm">
                   <iframe
@@ -31,17 +31,8 @@ export default function Page() {
                     className="block aspect-[848/1200] w-full border-0 bg-[#fafafa]"
                   />
                 </div>
-                <figcaption className="mt-3 text-sm">
-                  <div className="flex items-baseline justify-between gap-2 tracking-[-0.02em]">
-                    <span>
-                      <strong>Autor:</strong> {author}
-                    </span>
-                    <strong className="shrink-0 text-right whitespace-nowrap">
-                      {course}
-                    </strong>
-                  </div>
-                  <hr className="mt-2 border-t border-neutral-300" />
-                  <PosterVote poster={id} author={author} />
+                <figcaption className="mt-3">
+                  <PosterVote poster={id} author={author} number={index + 1} />
                 </figcaption>
               </figure>
             ))}
