@@ -11,14 +11,24 @@ export default function Page() {
       <div className="mx-auto grid w-full max-w-[1368px] grid-cols-12 gap-y-8">
         <h1
           lang="en"
-          className="col-span-12 text-[4em] leading-[0.8em] font-black tracking-[-0.06em] wrap-break-word md:col-span-6"
+          className="col-span-12 self-center text-[4em] leading-[0.8em] font-black tracking-[-0.06em] wrap-break-word md:col-span-6"
         >
           <span className="text-red-600">2026</span> International Interactive
           Poster Championship
         </h1>
-        <p className="col-span-12 text-right leading-relaxed md:col-span-6">
-          Este es un texto de ejemplo para la introducción del proyecto.
-        </p>
+        <div className="col-span-12 space-y-3 self-center text-right leading-[1.1em] font-light tracking-[-0.03em] md:col-span-6">
+          <p>
+            En Planeta FP hemos creado, en colaboración con la Fundación Ítaca,
+            una serie de carteles solidarios. Cada propuesta tiene una versión
+            en papel y otra animada. Todas comparten un mismo propósito: dar a
+            conocer la labor de la fundación y animar a donar para apoyar a
+            niños y niñas en riesgo de exclusión social.
+          </p>
+          <p className="font-bold">
+            Explora los carteles, descubre cómo cobran vida y vota por el que
+            más te guste.
+          </p>
+        </div>
         <hr className="col-span-full border-t border-[#0a0a0a]" />
         <LiveVoteTotalsProvider>
           <div className="col-span-full grid grid-cols-12 gap-6">
