@@ -1,0 +1,344 @@
+/* ==========================================================
+   Cartel interactivo 2 · 21 de diciembre
+   Fundación Itaca · Que ningún niño se quede fuera de la fiesta
+   Estilo inspirado en el Taipei Golden Horse Film Festival 2021
+   (Bito Studio)
+   ========================================================== */
+
+:root {
+  --poster-w: 848px;
+  --poster-h: 1200px;
+  --gutter: 48px;
+  --ink: #111111;
+  --halo: rgba(247, 243, 234, 0.55);   /* aureola contraria al texto (la cambia main.js con --ink) */
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #e6e4df;
+  font-family: "Inter Tight", system-ui, sans-serif;
+  color: var(--ink);
+}
+
+/* El escenario ocupa el tamaño escalado; el cartel conserva 848 × 1200 */
+.stage {
+  position: relative;
+  width: var(--poster-w);
+  height: var(--poster-h);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+}
+
+.poster {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--poster-w);
+  height: var(--poster-h);
+  overflow: hidden;
+  background: #f5b316;
+  transform-origin: top left;
+  user-select: none;
+}
+
+.scene-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+
+/* ---------- Zonas borrosas detrás de los textos ---------- */
+/* El desenfoque y el tinte se desvanecen hacia los bordes con una máscara, así no se ven cortes */
+.blur-zone {
+  position: absolute;
+  pointer-events: none;
+  -webkit-backdrop-filter: blur(var(--blur, 9px));
+  backdrop-filter: blur(var(--blur, 9px));
+  background: rgba(5, 8, 20, 0.3);
+}
+.blur-zone--top {
+  left: 0; right: 0; top: 0; height: 170px;
+  -webkit-mask-image: linear-gradient(to bottom, #000 55%, transparent);
+  mask-image: linear-gradient(to bottom, #000 55%, transparent);
+}
+.blur-zone--bottom {
+  left: 0; right: 0; bottom: 0; height: 440px;
+  -webkit-mask-image: linear-gradient(to top, #000 62%, transparent);
+  mask-image: linear-gradient(to top, #000 62%, transparent);
+}
+.blur-zone--left {
+  left: 0; top: 380px; width: 110px; height: 440px;
+  -webkit-mask-image: radial-gradient(ellipse at 0% 50%, #000 40%, transparent 72%);
+  mask-image: radial-gradient(ellipse at 0% 50%, #000 40%, transparent 72%);
+}
+.blur-zone--right {
+  right: 0; top: 340px; width: 80px; height: 520px;
+  -webkit-mask-image: radial-gradient(ellipse at 100% 50%, #000 40%, transparent 72%);
+  mask-image: radial-gradient(ellipse at 100% 50%, #000 40%, transparent 72%);
+}
+
+/* ---------- Arriba ---------- */
+.poster__top {
+  position: absolute;
+  top: 40px;
+  left: var(--gutter);
+  right: var(--gutter);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+
+
+
+
+.logo-slot {
+  margin-left: auto;
+  display: block;
+  height: 96px;
+  width: auto;                       /* logo blanco y transparente, directamente sobre el fondo oscuro */
+}
+
+/* ---------- Fechas en vertical ---------- */
+.dates {
+  position: absolute;
+  left: 22px;
+  top: 50%;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-family: "Michroma", sans-serif;
+  font-size: 22px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transform: translate(-50%, -50%) rotate(-90deg) translateY(50%);
+  transform-origin: center;
+}
+
+/* ---------- Abajo ---------- */
+.poster__bottom {
+  position: absolute;
+  left: var(--gutter);
+  right: var(--gutter);
+  bottom: 38px;
+}
+
+.title {
+  font-family: "Michroma", sans-serif;
+  font-size: 46px;
+  font-weight: 900;
+  line-height: 1.25;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.poster__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 22px;
+}
+
+.poster__row--credits {
+  margin-top: 18px;
+}
+
+.row__item {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+/* Botón de donar: píldora dorada que late, con un brillo que la recorre y un regalo que salta al pasar el cursor */
+.cta {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 15px 26px;
+  border: 0;
+  border-radius: 999px;
+  overflow: hidden;
+  background: linear-gradient(100deg, #ffb21e 0%, #ffe39a 45%, #ffb21e 100%) 0 0 / 220% 100%;
+  color: #3a0d08;
+  text-shadow: none;
+  font-family: "Michroma", sans-serif;
+  font-size: 15px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.18), 0 6px 20px rgba(0, 0, 0, 0.45), 0 0 26px rgba(255, 170, 40, 0.5);
+  animation: cta-pulse 2.4s ease-in-out infinite;
+  transition: transform 0.4s var(--ease), background-position 0.6s ease;
+}
+
+.cta:hover { background-position: 100% 0; }
+
+/* brillo que cruza el botón cada pocos segundos */
+.cta::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -40%;
+  width: 30%;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.75), transparent);
+  transform: skewX(-20deg);
+  animation: cta-shine 3.6s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.cta__gift { flex: none; transform-origin: 50% 90%; }
+.cta:hover .cta__gift { animation: gift-hop 0.6s ease-in-out infinite; }
+
+.cta__arrow {
+  display: inline-block;
+  font-size: 18px;
+  transition: transform 0.4s var(--ease);
+}
+
+@keyframes cta-pulse {
+  0%, 100% { box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.18), 0 6px 20px rgba(0, 0, 0, 0.45), 0 0 18px rgba(255, 170, 40, 0.4); }
+  50% { box-shadow: 0 0 0 5px rgba(255, 210, 90, 0.28), 0 6px 20px rgba(0, 0, 0, 0.45), 0 0 38px rgba(255, 170, 40, 0.85); }
+}
+@keyframes cta-shine { 0%, 55% { left: -40%; } 100% { left: 130%; } }
+@keyframes gift-hop {
+  0%, 100% { transform: translateY(0) rotate(0); }
+  35% { transform: translateY(-5px) rotate(-12deg); }
+  70% { transform: translateY(0) rotate(10deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cta, .cta::after, .cta:hover .cta__gift { animation: none; }
+}
+
+.brand-logo {
+  height: 34px;
+  width: auto;
+}
+
+.hint {
+  position: absolute;
+  top: 46px;
+  left: 50%;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  transform: translateX(-50%);
+  opacity: 0.95;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+
+/* Crédito del modelo 3D (licencia CC Attribution), vertical en el borde derecho */
+.credit-3d {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  opacity: 0.95;
+  transform: translate(50%, -50%) rotate(90deg);
+  pointer-events: none;
+}
+
+/* Color de los textos: main.js cambia --ink según lo que haya detrás (claro u oscuro) */
+.tone {
+  color: var(--ink);
+  /* aureola suave del color contrario: el texto se separa del fondo y de los juguetes */
+  text-shadow: 0 0 3px var(--halo), 0 0 14px var(--halo), 0 2px 22px var(--halo);
+  transition: color 0.5s ease, text-shadow 0.5s ease;
+}
+
+/* El título es lo más importante: más grueso y con más aureola */
+.title.tone {
+  -webkit-text-stroke: 0;
+  /* brillo de neón fijo: blanco con aura roja */
+  text-shadow:
+    0 0 3px rgba(255, 255, 255, 0.85),
+    0 0 10px rgba(255, 70, 85, 0.85),
+    0 0 26px rgba(255, 30, 55, 0.6),
+    0 0 54px rgba(255, 20, 45, 0.35);
+}
+
+
+
+.brand-logo {
+  transition: filter 0.5s ease;
+}
+
+
+/* ---------- Título llamativo: la última palabra, grande y dorada con brillo ---------- */
+.title .hl {
+  position: relative;
+  display: inline-block;
+  font-style: normal;
+  font-weight: 900;
+  font-size: 98px;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  /* relleno dorado metálico que se desplaza (los extremos son iguales para que el bucle no tenga salto) */
+  background: linear-gradient(100deg, #ffb21e 0%, #fff1a8 22%, #ffc83a 45%, #ff9d1a 62%, #fff1a8 82%, #ffb21e 100%) 0 0 / 640px 100% repeat-x;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  -webkit-text-stroke: 0;
+  text-shadow: none;
+  filter: drop-shadow(0 0 12px rgba(255, 190, 60, 0.7)) drop-shadow(0 0 34px rgba(255, 60, 40, 0.55)) drop-shadow(0 4px 0 rgba(110, 45, 0, 0.7));
+}
+
+/* Destellos en forma de estrella alrededor de la palabra */
+.title .hl::before,
+.title .hl::after {
+  position: absolute;
+  content: "\2726";
+  color: #fff6c8;
+  -webkit-text-fill-color: #fff6c8;
+  text-shadow: 0 0 12px #ffd45a, 0 0 28px #ffb21e;
+  pointer-events: none;
+}
+.title .hl::before { top: -6px; right: 4px; font-size: 38px; }
+.title .hl::after { bottom: 14px; left: 36%; font-size: 24px; }
+
+@keyframes gold-shine {
+  from { background-position: 0 0; }
+  to { background-position: 640px 0; }
+}
+@keyframes twinkle {
+  0%, 100% { opacity: 0.15; transform: scale(0.6) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1.15) rotate(25deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .title .hl, .title .hl::before, .title .hl::after { animation: none; }
+}
+
+/* Cartel en reposo (sin el cursor encima): se esconden la ayuda de arriba y el nombre, para poder imprimirlo limpio */
+.hint, .author { transition: opacity 0.4s ease; }
+.poster.is-idle .hint,
+.poster.is-idle .author { opacity: 0 !important; }

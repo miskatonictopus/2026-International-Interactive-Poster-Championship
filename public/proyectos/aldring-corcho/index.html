@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Que ningún niño se quede fuera de la fiesta · Fundación Itaca</title>
+  <link rel="icon" href="data:,">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Michroma&family=Inter+Tight:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Three.js desde CDN -->
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
+  <link rel="preload" as="image" href="logo-planetafp-claro.png">
+</head>
+<body>
+  <div class="stage" id="stage">
+    <main class="poster is-idle" id="poster">
+
+      <!-- Mando 3D con desenfoque de profundidad -->
+      <canvas class="scene-canvas" id="sceneCanvas"></canvas>
+
+      <!-- Zonas de texto: el fondo se ve borroso detrás de las letras para que se lean bien -->
+      <div class="blur-zone blur-zone--top" aria-hidden="true"></div>
+      <div class="blur-zone blur-zone--bottom" aria-hidden="true"></div>
+      <div class="blur-zone blur-zone--left" aria-hidden="true"></div>
+      <div class="blur-zone blur-zone--right" aria-hidden="true"></div>
+
+
+      <!-- Arriba: logo -->
+      <header class="poster__top">
+        <!-- Sustituir por el logo oficial: <img class="brand-logo" src="logo-itaca.png" alt="Fundación Itaca"> -->
+        <img class="logo-slot" src="logo-itaca.png" alt="Associació educativa Itaca" width="289" height="400" />
+      </header>
+
+      <!-- Fechas en vertical, como en el cartel original -->
+      <p class="dates">21 de diciembre</p>
+
+      <!-- Abajo: texto fijo -->
+      <footer class="poster__bottom">
+        <h1 class="title">Que ningún niño<br>se quede fuera<br>de la <em class="hl">fiesta.</em></h1>
+        <div class="poster__row">
+          <span class="row__item">Fundación Itaca · Navidad 2026</span>
+          <button class="cta" id="cta" type="button">
+            <svg class="cta__gift" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M20 7h-2.2A3 3 0 0 0 12 4.6 3 3 0 0 0 6.2 7H4a1 1 0 0 0-1 1v3h8V7.9h2V11h8V8a1 1 0 0 0-1-1ZM9 7a1 1 0 1 1 1-1v1Zm6 0h-1V6a1 1 0 1 1 1 1ZM4 13v6a2 2 0 0 0 2 2h5v-8Zm9 0v8h5a2 2 0 0 0 2-2v-6Z"/></svg>
+            <span>Dona un regalo</span>
+            <span class="cta__arrow" aria-hidden="true">→</span>
+          </button>
+        </div>
+        <div class="poster__row poster__row--credits">
+          <img class="brand-logo" src="logo-planetafp.png" alt="Planeta FP">
+          <span class="row__item author">Diseño: Aldring Corcho</span>
+        </div>
+      </footer>
+
+      <p class="credit-3d">Modelos 3D de varios autores · ver README</p>
+
+      <p class="hint" id="hint">Pasa el cursor por el mando</p>
+
+    </main>
+  </div>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>

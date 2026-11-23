@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Que empiece el juego para todos · 21 de diciembre · Fundación ITACA</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect x='14' y='38' width='72' height='50' fill='%23e8233f'/><rect x='44' y='38' width='12' height='50' fill='%23ffc93c'/><rect x='8' y='26' width='84' height='14' fill='%23e8233f'/></svg>">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="stage">
+    <!-- Cartel 848 × 1200 px (A3 adaptado a pantalla) -->
+    <main class="poster" id="poster" aria-label="Cartel: Que empiece el juego para todos. Un juguete también es un derecho.">
+
+      <!-- Capa 1: escena 3D (caja de regalo y circuito con three.js) -->
+      <div class="layer layer--scene" id="sceneLayer">
+        <canvas id="sceneCanvas"></canvas>
+      </div>
+
+      <!-- Capa 2: cabecera (tema y fecha) -->
+      <div class="layer layer--meta" id="metaLayer">
+        <header class="meta-top">
+          <p class="topic">Regalos de Navidad<br>contra la exclusión</p>
+          <p class="org">Fundación ITACA</p>
+          <p class="date"><span class="date__day">21</span><br>de diciembre</p>
+        </header>
+      </div>
+
+      <!-- Capa 3: titular -->
+      <div class="layer layer--title" id="titleLayer">
+        <h1 class="title" id="title">
+          <span class="title__line">Que empiece</span>
+          <span class="title__line">el juego</span>
+          <span class="title__line">para todos.</span>
+        </h1>
+      </div>
+
+      <!-- Capa: marco dorado del cartel, con ornamentos 3D en las esquinas (las imágenes las
+           genera main.js con three.js) -->
+      <div class="layer layer--frame" aria-hidden="true">
+        <img class="frame__corner frame__corner--top frame__corner--left" alt="">
+        <img class="frame__corner frame__corner--top frame__corner--right" alt="">
+        <img class="frame__corner frame__corner--bottom frame__corner--left" alt="">
+        <img class="frame__corner frame__corner--bottom frame__corner--right" alt="">
+      </div>
+
+      <!-- Capa: pedales de turbo en los laterales (con el ratón encima, su coche acelera) -->
+      <div class="layer layer--boost">
+        <div class="boost boost--left" id="boostLeft" style="--boost-color: #ff5fa8" aria-label="Turbo del coche rosa">
+          <!-- la cartela y el pedal 3D (un <canvas> con three.js) los crea main.js aquí -->
+        </div>
+        <div class="boost boost--right" id="boostRight" style="--boost-color: #8a4dff" aria-label="Turbo del coche morado">
+          <!-- la cartela y el pedal 3D (un <canvas> con three.js) los crea main.js aquí -->
+        </div>
+      </div>
+
+      <!-- Capa 4: mensaje de sensibilización, pie con semáforo y entidades colaboradoras -->
+      <div class="layer layer--foot" id="footLayer">
+        <aside class="message" id="message">
+          <img class="message__crest" id="messageCrest" alt="" aria-hidden="true">
+          <p class="message__claim">Un juguete también es un <em>derecho.</em></p>
+          <p class="message__body">
+            Muchos niños y niñas en riesgo de exclusión no tendrán ningún
+            regalo esta Navidad. Con tu donación, la Fundación ITACA los compra por ti.
+          </p>
+          <p class="message__count">Regalos entregados <strong id="giftCount">0</strong></p>
+          <!-- Llamada a donar (texto del cartel, no un botón) -->
+          <p class="donate">
+            <span class="donate__main">Dona un regalo</span>
+            <span class="donate__sub">El 21 de diciembre, cada euro<br>se convierte en un juguete.</span>
+          </p>
+        </aside>
+
+        <footer class="meta-bottom">
+          <p class="hint" id="hint">Pasa el ratón para dar la salida</p>
+          <div class="partners" id="partners">
+            <span class="partners__label">Colaboran</span>
+            <!-- En reposo los logos se ven en blanco; al pasar el ratón recuperan su color.
+                 data-chip: color de la placa que aparece detrás (para logos oscuros) -->
+            <span class="partner partner--itaca">
+              <img src="Imgs/Logo_Itaca.webp" alt="Fundación ITACA">
+            </span>
+            <span class="partner partner--planeta" data-chip="#f7efe0">
+              <img src="Imgs/logo_planetafp.png.webp" alt="PlanetaFP">
+            </span>
+          </div>
+          <div class="lights" id="lights" aria-hidden="true">
+            <span class="light"></span><span class="light"></span><span class="light"></span>
+          </div>
+        </footer>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- three.js r128 en local: funciona abriendo el archivo directamente y sin conexión -->
+  <script src="lib/three.min.js"></script>
+  <script src="logos-data.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>
