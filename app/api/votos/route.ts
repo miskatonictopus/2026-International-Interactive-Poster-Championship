@@ -1,10 +1,12 @@
 import { posters } from "@/lib/posters"
-import { readVotes, voteTotals } from "@/lib/votes"
+import { readTotals } from "@/lib/votes"
 
 export async function GET() {
-  const votes = await readVotes()
+  const totals = await readTotals()
   return Response.json(
-    Object.fromEntries(posters.map(({ id }) => [id, voteTotals(votes, id)])),
+    Object.fromEntries(
+      posters.map(({ id }) => [id, totals[id] ?? { total: 0, points: 0 }])
+    ),
     { headers: { "Cache-Control": "no-store" } }
   )
 }

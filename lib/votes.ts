@@ -1,22 +1,18 @@
-import { BlobPreconditionFailedError, get, put } from "@vercel/blob"
+import { get } from "@vercel/blob"
 import { randomUUID } from "node:crypto"
 import { mkdir, readFile, rename, rm, writeFile } from "node:fs/promises"
 import { dirname, join } from "node:path"
-import { setTimeout as delay } from "node:timers/promises"
 
 export type Votes = Record<string, Record<string, number>>
+export type Totals = { total: number; points: number }
 
 const voteFile =
   process.env.VOTES_FILE ?? join(process.cwd(), ".data", "votes.json")
-const blobPath =
-  process.env.VERCEL_ENV === "preview"
-    ? "itaca/preview-votes.json"
-    : "itaca/votes.json"
 let localWrites = Promise.resolve()
 
 /**
  * Solo se vota en producción. En local o en las previews se puede forzar con
- * VOTING_OPEN=1 para hacer pruebas (los votos van a otro almacén).
+ * VOTING_OPEN=1 para hacer pruebas.
  */
 export function votingIsOpen() {
   return (
@@ -24,16 +20,77 @@ export function votingIsOpen() {
   )
 }
 
-function blobIsConfigured() {
-  if (process.env.BLOB_STORE_ID || process.env.BLOB_READ_WRITE_TOKEN)
-    return true
+/* ---------- Supabase (producción) ---------- */
+
+function supabase() {
+  const url = process.env.SUPABASE_URL
+  const key = process.env.SUPABASE_SECRET_KEY
+  if (url && key) return { url: url.replace(/\/$/, ""), key }
   if (process.env.VERCEL === "1") {
     throw new Error(
-      "Conecta un almacén privado de Vercel Blob para guardar los votos"
+      "Configura SUPABASE_URL y SUPABASE_SECRET_KEY para guardar los votos"
     )
   }
-  return false
+  return null
 }
+
+async function rest(
+  { url, key }: { url: string; key: string },
+  path: string,
+  init: RequestInit = {}
+) {
+  const headers = new Headers(init.headers)
+  headers.set("apikey", key)
+  // Las claves antiguas (service_role) son JWT y van también como Bearer.
+  if (!key.startsWith("sb_")) headers.set("Authorization", `Bearer ${key}`)
+  if (init.body) headers.set("Content-Type", "application/json")
+
+  const response = await fetch(`${url}/rest/v1/${path}`, {
+    ...init,
+    headers,
+    cache: "no-store",
+    signal: AbortSignal.timeout(8000),
+  })
+  if (!response.ok) {
+    throw new Error(
+      `Supabase respondió ${response.status}: ${await response.text()}`
+    )
+  }
+  return response
+}
+
+async function supabaseTotals(db: { url: string; key: string }) {
+  const rows: { poster: string; total: number; points: number }[] = await (
+    await rest(db, "rpc/vote_totals", { method: "POST", body: "{}" })
+  ).json()
+  return Object.fromEntries(
+    rows.map(({ poster, total, points }) => [
+      poster,
+      { total: Number(total), points: Number(points) },
+    ])
+  )
+}
+
+/** Inserta votos; con `keepExisting` no sobrescribe los que ya existan. */
+export async function upsertVotes(
+  rows: { poster: string; voter: string; rating: number }[],
+  { keepExisting = false } = {}
+) {
+  const db = supabase()
+  if (!db) throw new Error("Supabase no está configurado")
+  if (rows.length === 0) return
+  await rest(db, "votes?on_conflict=poster,voter", {
+    method: "POST",
+    headers: {
+      Prefer: `resolution=${keepExisting ? "ignore" : "merge"}-duplicates,return=minimal`,
+    },
+    body: JSON.stringify(
+      rows.map((row) => ({ ...row, updated_at: new Date().toISOString() }))
+    ),
+  })
+}
+
+/* ---------- Archivo local (desarrollo sin Supabase) ---------- */
 
 async function readLocalVotes(): Promise<Votes> {
   try {
@@ -46,29 +103,7 @@ async function readLocalVotes(): Promise<Votes> {
   }
 }
 
-async function readBlobVotes(): Promise<{ votes: Votes; etag?: string }> {
-  const result = await get(blobPath, {
-    access: "private",
-    useCache: false,
-    abortSignal: AbortSignal.timeout(8000),
-  })
-  if (!result) return { votes: {} }
-  if (result.statusCode !== 200 || !result.blob.etag) {
-    throw new Error(
-      "La lectura de votos en Vercel Blob no devolvió una versión válida"
-    )
-  }
-  return {
-    votes: await new Response(result.stream).json(),
-    etag: result.blob.etag,
-  }
-}
-
-export async function readVotes() {
-  return blobIsConfigured() ? (await readBlobVotes()).votes : readLocalVotes()
-}
-
-export function voteTotals(votes: Votes, poster: string) {
+function localTotals(votes: Votes, poster: string): Totals {
   const ratings = Object.values(votes[poster] ?? {})
   return {
     total: ratings.length,
@@ -76,47 +111,52 @@ export function voteTotals(votes: Votes, poster: string) {
   }
 }
 
-function applyVote(
-  votes: Votes,
-  poster: string,
-  voter: string,
-  rating: number
-) {
-  votes[poster] ??= {}
-  votes[poster][voter] = rating
+/* ---------- API común ---------- */
+
+/** Totales de todos los pósters que tienen votos. */
+export async function readTotals(): Promise<Record<string, Totals>> {
+  const db = supabase()
+  if (db) return supabaseTotals(db)
+  const votes = await readLocalVotes()
+  return Object.fromEntries(
+    Object.keys(votes).map((poster) => [poster, localTotals(votes, poster)])
+  )
 }
 
-async function saveBlobVote(poster: string, voter: string, rating: number) {
-  for (let attempt = 0; attempt < 12; attempt++) {
-    const { votes, etag } = await readBlobVotes()
-    if (votes[poster]?.[voter] === rating) return votes
-    applyVote(votes, poster, voter, rating)
-
-    try {
-      await put(blobPath, JSON.stringify(votes), {
-        access: "private",
-        contentType: "application/json",
-        addRandomSuffix: false,
-        ...(etag ? { ifMatch: etag } : { allowOverwrite: false }),
-      })
-      return votes
-    } catch (error) {
-      // When two requests create the first blob, the second can fail before an ETag exists.
-      if (!(error instanceof BlobPreconditionFailedError)) {
-        if (etag || !(await readBlobVotes()).etag) throw error
-      }
-      await delay(Math.random() * Math.min(25 * 2 ** attempt, 250))
+/** Totales de un póster y el voto de este votante. */
+export async function readSummary(poster: string, voter: string) {
+  const db = supabase()
+  if (!db) {
+    const votes = await readLocalVotes()
+    return {
+      ...localTotals(votes, poster),
+      rating: votes[poster]?.[voter] ?? null,
     }
   }
-  throw new Error("Hay demasiados votos simultáneos. Vuelve a enviar el voto")
+
+  const [totals, mine] = await Promise.all([
+    supabaseTotals(db),
+    rest(
+      db,
+      `votes?select=rating&poster=eq.${encodeURIComponent(poster)}&voter=eq.${encodeURIComponent(voter)}`
+    ).then((response) => response.json() as Promise<{ rating: number }[]>),
+  ])
+  return {
+    ...(totals[poster] ?? { total: 0, points: 0 }),
+    rating: mine[0]?.rating ?? null,
+  }
 }
 
 export async function saveVote(poster: string, voter: string, rating: number) {
-  if (blobIsConfigured()) return saveBlobVote(poster, voter, rating)
+  if (supabase()) {
+    await upsertVotes([{ poster, voter, rating }])
+    return readSummary(poster, voter)
+  }
 
   const write = localWrites.then(async () => {
     const votes = await readLocalVotes()
-    applyVote(votes, poster, voter, rating)
+    votes[poster] ??= {}
+    votes[poster][voter] = rating
 
     await mkdir(dirname(voteFile), { recursive: true })
     const temporaryFile = `${voteFile}.${randomUUID()}.tmp`
@@ -128,11 +168,27 @@ export async function saveVote(poster: string, voter: string, rating: number) {
     } finally {
       await rm(temporaryFile, { force: true })
     }
-    return votes
   })
   localWrites = write.then(
     () => undefined,
     () => undefined
   )
-  return write
+  await write
+  return readSummary(poster, voter)
+}
+
+/* ---------- Migración desde Vercel Blob ---------- */
+
+/** Lee los votos antiguos guardados en Vercel Blob (solo para migrarlos). */
+export async function readLegacyBlobVotes(): Promise<Votes> {
+  const result = await get("itaca/votes.json", {
+    access: "private",
+    useCache: false,
+    abortSignal: AbortSignal.timeout(8000),
+  })
+  if (!result) return {}
+  if (result.statusCode !== 200) {
+    throw new Error("No se pudieron leer los votos de Vercel Blob")
+  }
+  return new Response(result.stream).json()
 }

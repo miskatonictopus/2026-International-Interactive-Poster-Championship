@@ -2,13 +2,7 @@ import { randomUUID } from "node:crypto"
 import { NextRequest, NextResponse } from "next/server"
 
 import { posters } from "@/lib/posters"
-import {
-  readVotes,
-  saveVote,
-  type Votes,
-  voteTotals,
-  votingIsOpen,
-} from "@/lib/votes"
+import { readSummary, saveVote, votingIsOpen } from "@/lib/votes"
 
 type Context = { params: Promise<{ poster: string }> }
 
@@ -21,13 +15,9 @@ function getVoter(request: NextRequest) {
   return value && uuid.test(value) ? value : null
 }
 
-function summary(votes: Votes, poster: string, voter: string) {
+function summary(data: Awaited<ReturnType<typeof readSummary>>) {
   return NextResponse.json(
-    {
-      ...voteTotals(votes, poster),
-      rating: votes[poster]?.[voter] ?? null,
-      open: votingIsOpen(),
-    },
+    { ...data, open: votingIsOpen() },
     { headers: { "Cache-Control": "private, no-store" } }
   )
 }
@@ -40,7 +30,7 @@ export async function GET(request: NextRequest, { params }: Context) {
 
   const previousVoter = getVoter(request)
   const voter = previousVoter ?? randomUUID()
-  const response = summary(await readVotes(), poster, voter)
+  const response = summary(await readSummary(poster, voter))
 
   if (!previousVoter) {
     response.cookies.set(voterCookie, voter, {
@@ -80,5 +70,5 @@ export async function PUT(request: NextRequest, { params }: Context) {
     return new Response(null, { status: 400 })
   }
 
-  return summary(await saveVote(poster, voter, rating), poster, voter)
+  return summary(await saveVote(poster, voter, rating))
 }
