@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ningún niño sin regalo · Fundación ITACA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Mountains+of+Christmas:wght@400;700&family=Great+Vibes&family=Quicksand:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="stage">
+    <main class="poster" id="poster">
+
+      <!-- ===== Fondo decorativo ===== -->
+      <div class="grain"></div>
+
+      <div class="parallax" data-depth="10">
+        <span class="star" style="top:9%;left:10%"></span>
+        <span class="star" style="top:16%;left:30%"></span>
+        <span class="star" style="top:25%;left:92%"></span>
+        <span class="star" style="top:36%;left:5%"></span>
+        <span class="star" style="top:42%;left:86%"></span>
+        <span class="star big" style="top:21%;left:16%"></span>
+      </div>
+
+      <div class="moon parallax" data-depth="24"><span class="moon__disc"></span></div>
+
+      <canvas class="snow" id="snow" width="848" height="1200"></canvas>
+
+      <!-- ===== Cabecera ===== -->
+      <header class="top">
+        <div class="brand">
+          <span class="brand__mark">I</span>
+          <span class="brand__name">Fundación<br><strong>ITACA</strong></span>
+        </div>
+        <p class="top__tag">Campaña de Navidad<br><strong>2026</strong></p>
+        <p class="top__place">L'Hospitalet<br>de Llobregat</p>
+      </header>
+
+      <!-- Guirnalda: bombillas interactivas (mouseenter / mouseleave) -->
+      <svg class="garland" viewBox="0 0 848 80" aria-hidden="true">
+        <path id="garlandPath" d="M -10 8 Q 212 70 424 24 T 858 16" />
+      </svg>
+      <div class="bulbs" id="bulbs"></div>
+
+      <!-- ===== Bloque principal: fecha + titular + subtítulo en flujo vertical ===== -->
+      <section class="hero">
+        <div class="date">
+          <span class="date__day parallax" data-depth="-10">21</span>
+          <span class="date__month">de diciembre</span>
+        </div>
+
+        <!-- Titular (letras reaccionan a mousemove) -->
+        <h1 class="headline" id="headline">
+          <span class="headline__line" data-split>Ningún niño</span>
+          <span class="headline__line headline__line--accent" data-split>sin regalo</span>
+        </h1>
+        <p class="sub">Recogida solidaria de donativos para comprar los regalos de Navidad<br>de niños y niñas en riesgo de exclusión social</p>
+      </section>
+
+      <!-- ===== Escena: ciudad + regalos ===== -->
+      <div class="city" id="city" aria-hidden="true"></div>
+      <div class="ground"></div>
+
+      <section class="gifts" aria-label="Regalos">
+        <div class="gift" data-color="#e63946" data-msg="Un cuento">
+          <div class="gift__lid"></div><div class="gift__box"></div>
+          <span class="gift__tag">Lucía, 6</span><span class="gift__msg"></span>
+        </div>
+        <div class="gift gift--tall" data-color="#f4a261" data-msg="Una pelota">
+          <div class="gift__lid"></div><div class="gift__box"></div>
+          <span class="gift__tag">Adam, 9</span><span class="gift__msg"></span>
+        </div>
+        <div class="gift gift--wide" data-color="#2a9d8f" data-msg="Unos colores">
+          <div class="gift__lid"></div><div class="gift__box"></div>
+          <span class="gift__tag">Marta, 4</span><span class="gift__msg"></span>
+        </div>
+        <div class="gift gift--small" data-color="#8ecae6" data-msg="Un puzle">
+          <div class="gift__lid"></div><div class="gift__box"></div>
+          <span class="gift__tag">Iker, 7</span><span class="gift__msg"></span>
+        </div>
+      </section>
+
+      <!-- ===== Mensaje de sensibilización ===== -->
+      <section class="message">
+        <p class="message__quote">“La Navidad también es suya.”</p>
+        <p class="message__text">
+          Con <strong>10&nbsp;€</strong> un niño o niña de nuestro barrio abrirá un regalo
+          la mañana de Navidad. Dona antes del <strong>21 de diciembre</strong>.
+        </p>
+      </section>
+
+      <section class="stats">
+        <div class="stat"><span class="stat__num">10 €</span><span class="stat__lbl">= 1 regalo</span></div>
+        <div class="stat"><span class="stat__num">350</span><span class="stat__lbl">niños y niñas<br>esperan</span></div>
+        <div class="stat stat--live"><span class="stat__num" id="counter">0</span><span class="stat__lbl">regalos que<br>has abierto</span></div>
+      </section>
+
+      <!-- ===== Llamada a la acción ===== -->
+      <a class="cta" id="cta" href="#">
+        <span class="cta__text">Dona ahora</span>
+        <span class="cta__url">fundacionitaca.org/regalos · Bizum 00000</span>
+      </a>
+
+      <!-- ===== Branding ===== -->
+      <footer class="footer">
+        <span class="footer__lbl">Organiza y colabora</span>
+        <div class="partners">
+          <div class="partner"><span class="partner__logo">ITACA</span><span class="partner__txt">Fundación<br>ITACA</span></div>
+          <div class="partner"><span class="partner__logo partner__logo--round">L'H</span><span class="partner__txt">Ajuntament de<br>L'Hospitalet</span></div>
+          <div class="partner"><span class="partner__logo partner__logo--seal">✓</span><span class="partner__txt">Entidad sin<br>ánimo de lucro</span></div>
+          <div class="partner"><span class="partner__logo partner__logo--heart">♥</span><span class="partner__txt">Campaña<br>Juguete Solidario</span></div>
+        </div>
+      </footer>
+
+      <div class="glow" id="glow"></div>
+    </main>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>
