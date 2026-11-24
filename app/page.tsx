@@ -2,8 +2,27 @@ import { LiveVoteTotalsProvider } from "@/components/live-vote-totals"
 import { PosterCard } from "@/components/poster-card"
 import { RankingDialog } from "@/components/ranking-dialog"
 import { posters } from "@/lib/posters"
+import { connection } from "next/server"
 
-export default function Page() {
+// Fisher–Yates: every order is equally likely
+function shuffle<T>(items: readonly T[]): T[] {
+  const result = [...items]
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[result[i], result[j]] = [result[j], result[i]]
+  }
+  return result
+}
+
+export default async function Page() {
+  // Render per request so each visit gets a fresh order (no build-time prerender)
+  await connection()
+  // Each poster keeps its fixed number; only the display order is random,
+  // so no poster gets the advantage of always appearing first.
+  const shuffledPosters = shuffle(
+    posters.map((poster, index) => ({ ...poster, number: index + 1 }))
+  )
+
   return (
     <main
       lang="es"
@@ -38,8 +57,8 @@ export default function Page() {
         <hr className="col-span-full border-t border-[#0a0a0a]" />
         <LiveVoteTotalsProvider>
           <div className="col-span-full grid grid-cols-12 gap-6">
-            {posters.map(({ id, author }, index) => (
-              <PosterCard key={id} id={id} author={author} number={index + 1} />
+            {shuffledPosters.map(({ id, author, number }) => (
+              <PosterCard key={id} id={id} author={author} number={number} />
             ))}
           </div>
         </LiveVoteTotalsProvider>
