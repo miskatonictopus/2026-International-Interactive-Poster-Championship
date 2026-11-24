@@ -1,0 +1,602 @@
+/* =========================================================
+   REGALA ILUSIÓN · Cartel interactivo · Fundación ITACA
+   Formato: 848 × 1200 px (A3 vertical adaptado a pantalla)
+   ========================================================= */
+
+:root {
+  --red: #d7192e;
+  --red-dark: #6e0613;
+  --gold: #ffd25a;
+  --cream: #fff6e6;
+  --green: #0f7a4a;
+  --ink: #2a0208;
+
+  --poster-w: 848px;
+  --poster-h: 1200px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  background: #14020a;
+  overflow: hidden;
+  font-family: "Inter", system-ui, sans-serif;
+}
+
+/* Escenario: cartel pegado arriba y centrado en horizontal; JS calcula la escala */
+.stage {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.poster {
+  position: relative;
+  width: var(--poster-w);
+  height: var(--poster-h);
+  flex: none;
+  overflow: hidden;
+  color: var(--cream);
+  background:
+    radial-gradient(ellipse at 50% 0%, #ff3b4f 0%, transparent 55%),
+    linear-gradient(180deg, var(--red) 0%, #a80d20 55%, var(--red-dark) 100%);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, .6);
+  transform-origin: top center;
+  cursor: crosshair;
+}
+
+/* ---------- Capas de fondo ---------- */
+
+.snow {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  pointer-events: none;
+}
+
+/* Confeti del terremoto */
+.shreds {
+  position: absolute;
+  inset: 0;
+  z-index: 21;
+  pointer-events: none;
+}
+
+.spotlight {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  /* --mx / --my los actualiza main.js */
+  background: radial-gradient(circle 320px at var(--mx, 50%) var(--my, 40%),
+              rgba(255, 210, 90, .38), transparent 70%);
+  mix-blend-mode: screen;
+}
+
+.parallax {
+  will-change: transform;
+  transition: transform .25s ease-out;
+}
+
+/* Árbol de fondo: semitransparente para no competir con el texto */
+.xmas-tree {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.xmas-tree__body { opacity: .9; }
+.tree-ornament { opacity: .95; }
+.tree-bulb { transition: r .2s ease; }
+.xmas-tree__star {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.big-date {
+  position: absolute;
+  z-index: 0;
+  top: 40px;
+  left: 50%;
+  margin-left: -390px;
+  font-family: "Anton", Impact, sans-serif;
+  font-size: 900px;
+  line-height: 1;
+  letter-spacing: -20px;
+  color: transparent;
+  -webkit-text-stroke: 3px rgba(255, 246, 230, .13);
+  user-select: none;
+  pointer-events: none;
+}
+
+.star {
+  position: absolute;
+  z-index: 2;
+  font-size: 46px;
+  color: var(--gold);
+  text-shadow: 0 0 18px rgba(255, 210, 90, .9);
+  pointer-events: none;
+}
+.star--small { font-size: 26px; opacity: .8; }
+
+/* ---------- Cabecera ---------- */
+
+.top {
+  position: absolute;
+  z-index: 5;
+  top: 36px;
+  left: 48px;
+  right: 48px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--cream);
+}
+.logo__mark { width: 54px; height: 54px; color: var(--gold); }
+.logo__text strong {
+  display: block;
+  font-weight: 800;
+  font-size: 23px;
+  letter-spacing: 1.5px;
+  text-shadow: 2px 2px 0 var(--ink);
+}
+.logo__text span {
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.top__tag {
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: .5px;
+  text-transform: uppercase;
+  padding: 9px 16px;
+  color: var(--ink);
+  background: var(--gold);
+  border-radius: 40px;
+  box-shadow: 3px 3px 0 var(--ink);
+}
+
+/* ---------- Fecha ---------- */
+
+.date {
+  position: absolute;
+  z-index: 5;
+  top: 128px;
+  left: 48px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.date__day {
+  font-family: "Anton", Impact, sans-serif;
+  font-size: 92px;
+  line-height: 1;
+  color: var(--gold);
+  text-shadow: 4px 4px 0 var(--ink);
+}
+.date__month {
+  font-family: "Anton", Impact, sans-serif;
+  font-size: 40px;
+  letter-spacing: 4px;
+  line-height: 1;
+  padding: 10px 16px 12px;
+  background: var(--cream);
+  color: var(--red);
+  transform: rotate(-3deg);
+  box-shadow: 5px 5px 0 var(--ink);
+}
+
+/* ---------- Titular ---------- */
+
+.headline {
+  position: absolute;
+  z-index: 6;
+  top: 244px;
+  left: 40px;
+  font-family: "Anton", Impact, sans-serif;
+  font-weight: 400;
+  line-height: .9;
+  text-transform: uppercase;
+}
+
+.headline__line {
+  display: block;
+  font-size: 212px;
+  white-space: nowrap;
+  color: var(--cream);
+  text-shadow: 7px 7px 0 var(--ink);
+}
+.headline__line--accent {
+  color: var(--gold);
+  margin-top: 22px;
+}
+
+.letter {
+  display: inline-block;
+  /* El movimiento lo aplica JS; CSS sólo lo suaviza */
+  transition: transform .35s cubic-bezier(.34, 1.8, .5, 1),
+              color .25s ease,
+              text-shadow .25s ease;
+  cursor: default;
+}
+
+/* ---------- Mensaje ---------- */
+
+.message {
+  position: absolute;
+  z-index: 5;
+  top: 668px;
+  left: 48px;
+  right: 48px;
+  font-size: 25px;
+  font-weight: 600;
+  line-height: 1.3;
+  text-shadow: 2px 2px 0 var(--ink);
+}
+.message strong {
+  font-size: 38px;
+  font-weight: 800;
+  white-space: nowrap;
+  text-shadow: none;
+  color: var(--cream);
+  background: var(--ink);
+  padding: 4px 14px;
+  display: inline-block;
+  box-shadow: 5px 5px 0 rgba(0, 0, 0, .35);
+}
+
+/* ---------- Regalos ---------- */
+
+.gifts {
+  position: absolute;
+  z-index: 7;
+  top: 790px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 60px;
+}
+
+.gift {
+  position: relative;
+  width: 130px;
+  height: 150px;
+  cursor: pointer;
+  transition: transform .3s ease;
+}
+.gift--big { width: 160px; height: 175px; }
+
+.gift__box {
+  position: absolute;
+  bottom: 0;
+  left: 8px;
+  right: 8px;
+  height: 62%;
+  background:
+    linear-gradient(90deg, transparent 42%, var(--gold) 42%, var(--gold) 58%, transparent 58%),
+    var(--green);
+  border-radius: 4px;
+  box-shadow: 6px 6px 0 var(--ink);
+  transition: box-shadow .3s ease;
+}
+
+.gift__lid {
+  position: absolute;
+  bottom: 60%;
+  left: 0;
+  right: 0;
+  height: 24%;
+  z-index: 2;
+  background:
+    linear-gradient(90deg, transparent 42%, var(--gold) 42%, var(--gold) 58%, transparent 58%),
+    #12955a;
+  border-radius: 4px;
+  box-shadow: 6px 6px 0 var(--ink);
+  transform-origin: 10% 100%;
+  transition: transform .45s cubic-bezier(.34, 1.7, .5, 1);
+}
+
+.gift__bow {
+  position: absolute;
+  left: 50%;
+  top: -26px;
+  width: 52px;
+  height: 28px;
+  margin-left: -26px;
+}
+.gift__bow::before,
+.gift__bow::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  width: 26px;
+  height: 26px;
+  border: 7px solid var(--gold);
+  border-radius: 50% 50% 0 50%;
+}
+.gift__bow::before { left: 0; transform: rotate(10deg); }
+.gift__bow::after  { right: 0; transform: scaleX(-1) rotate(10deg); }
+
+.gift__label {
+  position: absolute;
+  z-index: 3;
+  left: 50%;
+  bottom: 4%;
+  width: 190px;
+  margin-left: -95px;
+  text-align: center;
+  color: var(--cream);
+  pointer-events: none;
+  transition: transform .4s cubic-bezier(.34, 1.7, .5, 1), opacity .3s ease;
+}
+.gift__label b {
+  display: block;
+  font-family: "Anton", Impact, sans-serif;
+  font-weight: 400;
+  font-size: 48px;
+  line-height: 1;
+  text-shadow: 3px 3px 0 var(--ink);
+}
+.gift__label small {
+  display: block;
+  font-size: 20px;
+  text-shadow: 2px 2px 0 var(--ink);
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  opacity: 0;
+  transition: opacity .3s ease;
+}
+
+.sparkle {
+  position: absolute;
+  left: 50%;
+  top: 40%;
+  font-size: 22px;
+  color: var(--gold);
+  pointer-events: none;
+  text-shadow: 0 0 10px #fff;
+}
+
+.hint {
+  position: absolute;
+  z-index: 5;
+  top: 972px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: .5px;
+  text-transform: uppercase;
+  color: var(--gold);
+  text-shadow: 2px 2px 0 var(--ink);
+  transition: opacity .4s ease;
+}
+
+/* ---------- CTA ---------- */
+
+.cta {
+  position: absolute;
+  z-index: 8;
+  top: 1006px;
+  left: 50%;
+  width: 380px;
+  margin-left: -190px;
+  display: block;
+  text-decoration: none;
+  transition: transform .2s ease-out;
+}
+.cta__inner {
+  display: block;
+  padding: 10px 0 12px;
+  text-align: center;
+  font-family: "Anton", Impact, sans-serif;
+  font-size: 48px;
+  line-height: 1.2;
+  letter-spacing: 4px;
+  color: var(--red);
+  background: var(--cream);
+  border-radius: 80px;
+  box-shadow: 0 8px 0 var(--ink);
+  transition: background .25s ease, color .25s ease, box-shadow .25s ease, transform .2s ease-out;
+}
+
+.cta__info {
+  position: absolute;
+  z-index: 5;
+  top: 1096px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 30px;
+  font-weight: 800;
+  text-shadow: 2px 2px 0 var(--ink);
+}
+
+/* ---------- Sello final ---------- */
+
+.stamp {
+  position: absolute;
+  z-index: 9;
+  top: 520px;
+  right: 40px;
+  padding: 12px 22px;
+  font-family: "Anton", Impact, sans-serif;
+  font-size: 54px;
+  letter-spacing: 3px;
+  color: var(--gold);
+  border: 6px solid var(--gold);
+  border-radius: 10px;
+  background: rgba(42, 2, 8, .55);
+  transform: rotate(-12deg) scale(0);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform .5s cubic-bezier(.34, 1.8, .5, 1), opacity .3s ease;
+}
+
+/* ---------- Pie ---------- */
+
+.bottom {
+  position: absolute;
+  z-index: 5;
+  bottom: 14px;
+  left: 32px;
+  right: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 246, 230, .35);
+  font-size: 18px;
+}
+.badge {
+  font-weight: 800;
+  white-space: nowrap;
+  padding: 6px 12px;
+  border-radius: 4px;
+  background: var(--cream);
+  color: var(--red-dark);
+}
+.badge--seal {
+  margin-left: 4px;
+  font-size: 16px;
+  text-transform: uppercase;
+  background: var(--gold);
+  color: var(--ink);
+  border-radius: 50px;
+}
+
+/* =========================================================
+   EFECTOS LOCOS
+   ========================================================= */
+
+.svg-filters { position: absolute; width: 0; height: 0; }
+
+.poster { cursor: none; }
+.poster * { cursor: none !important; }
+
+/* Lente que invierte los colores de lo que hay debajo del cursor */
+.lens {
+  position: absolute;
+  z-index: 40;
+  top: 0;
+  left: 0;
+  width: 34px;
+  height: 34px;
+  margin: -17px 0 0 -17px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 246, 230, .9);
+  backdrop-filter: invert(1) hue-rotate(180deg) saturate(1.6);
+  -webkit-backdrop-filter: invert(1) hue-rotate(180deg) saturate(1.6);
+  pointer-events: none;
+  opacity: 0;
+  transition: width .35s cubic-bezier(.34, 1.6, .5, 1),
+              height .35s cubic-bezier(.34, 1.6, .5, 1),
+              margin .35s cubic-bezier(.34, 1.6, .5, 1),
+              opacity .2s ease;
+}
+
+/* Arbolito dentro de la lente: se inclina desde la base (JS) */
+.cursor-tree {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 32px;
+  height: 40px;
+  margin: -20px 0 0 -16px;
+  transform-origin: 50% 100%;
+  filter: drop-shadow(0 0 4px rgba(255, 210, 90, .8));
+}
+
+/* Luces del arbolito: cada una parpadea a su ritmo */
+.tree-light {
+  animation: twinkle 1.2s ease-in-out infinite alternate;
+}
+.tree-light:nth-of-type(2n) { animation-duration: .8s; animation-delay: -.3s; }
+.tree-light:nth-of-type(3n) { animation-duration: 1.5s; animation-delay: -.7s; }
+
+@keyframes twinkle {
+  from { opacity: .25; }
+  to   { opacity: 1; }
+}
+
+/* Tinta fluida del splash cursor (WebGL) */
+.fluid {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 24;
+  pointer-events: none;
+}
+
+/* Ojos saltones de los regalos */
+.eye {
+  position: absolute;
+  top: 6px;
+  width: 26px;
+  height: 26px;
+  background: #fff;
+  border: 3px solid var(--ink);
+  border-radius: 50%;
+  overflow: hidden;
+}
+.eye:first-child { left: 8%; }
+.eye:last-child  { right: 8%; }
+.gift--big .eye { width: 32px; height: 32px; }
+.pupil {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 11px;
+  height: 11px;
+  margin: -5.5px 0 0 -5.5px;
+  background: var(--ink);
+  border-radius: 50%;
+}
+
+/* Onda expansiva del clic */
+.shock-ring {
+  position: absolute;
+  z-index: 35;
+  width: 40px;
+  height: 40px;
+  margin: -20px 0 0 -20px;
+  border: 6px solid var(--gold);
+  border-radius: 50%;
+  pointer-events: none;
+  mix-blend-mode: difference;
+}
+
+/* Terremoto al sacudir el ratón */
+@keyframes quake {
+  0%, 100% { transform: translate(0, 0) rotate(0); }
+  10% { transform: translate(-18px, 8px) rotate(-1.5deg); }
+  20% { transform: translate(16px, -10px) rotate(1.2deg); }
+  30% { transform: translate(-14px, -6px) rotate(-1deg); }
+  40% { transform: translate(12px, 10px) rotate(1deg); }
+  50% { transform: translate(-10px, 4px) rotate(-.8deg); }
+  60% { transform: translate(8px, -6px) rotate(.6deg); }
+  70% { transform: translate(-6px, 4px) rotate(-.4deg); }
+  85% { transform: translate(3px, -2px) rotate(.2deg); }
+}
+.stage--quake { animation: quake .7s ease-out; }
