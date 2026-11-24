@@ -1,0 +1,545 @@
+/* =========================================================
+   ILUMINA SU NAVIDAD · versión 3D
+   Cartel interactivo · 21 de diciembre · Associació Educativa Itaca
+
+   La escena entera (cielo, pueblos, árboles, niños, regalos,
+   nieve, Santa, lema) se dibuja en 3D en el <canvas> con
+   Three.js (main.js). Este CSS solo coloca los textos pequeños,
+   el botón de donar y el pie por encima del lienzo.
+
+   Índice
+   1. Variables
+   2. Reset
+   3. Página y escalado del cartel
+   4. Lienzo 3D
+   5. Cabecera y etiquetas
+   6. Botón de donar
+   7. Pie, branding y créditos
+   8. Pantallas táctiles y movimiento reducido
+
+   No hay ninguna regla :hover: los cambios los dispara main.js.
+   ========================================================= */
+
+/* ---------- 1. Variables ---------- */
+:root {
+  --rojo-oscuro: #4a0811;
+  --noche: #0b0d12;
+  --tinta: #111111;
+  --crema: #fff1e6;
+  --dorado: #ffd166;
+  --gris-frio: #8a93a6;
+
+  --fuente-texto: "Inter Tight", Arial, sans-serif;
+
+  --cartel-ancho: 848px;
+  --cartel-alto: 1200px;
+  --margen: 40px;
+
+  --salida-suave: cubic-bezier(0.22, 1, 0.36, 1);
+  --salida-rebote: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ---------- 2. Reset ---------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+strong {
+  font-weight: 800;
+}
+
+.solo-lectores {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* ---------- 3. Página y escalado del cartel ---------- */
+body {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: #1a1a1a;
+  color: var(--crema);
+  font-family: var(--fuente-texto);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* main.js da al escenario el tamaño del cartel ya escalado */
+.escenario {
+  position: relative;
+  width: var(--cartel-ancho);
+  height: var(--cartel-alto);
+}
+
+.cartel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--cartel-ancho);
+  height: var(--cartel-alto);
+  overflow: hidden;
+  background: var(--noche);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+  transform-origin: top left; /* main.js aplica scale() si la ventana es pequeña */
+  /* Móviles: el dedo hace de cursor (sin scroll ni zoom al deslizar) */
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* ---------- 4. Lienzo 3D ---------- */
+.mundo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ---------- 5. Cabecera y etiquetas ---------- */
+.cabecera {
+  position: absolute;
+  top: 46px;
+  left: var(--margen);
+  right: var(--margen);
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  font: 600 14px/1.25 var(--fuente-texto);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+}
+
+.cabecera__derecha {
+  text-align: right;
+}
+
+.solo-tactil {
+  display: none;
+}
+
+.etiquetas {
+  position: absolute;
+  top: 448px;
+  left: var(--margen);
+  right: var(--margen);
+  display: flex;
+  justify-content: space-between;
+  font: 800 13px/1 var(--fuente-texto);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+}
+
+.etiqueta-triste {
+  position: relative;
+  color: var(--gris-frio);
+}
+
+.etiqueta-sin,
+.etiqueta-con {
+  transition: opacity 0.9s ease;
+}
+
+.etiqueta-con {
+  position: absolute;
+  right: 0;
+  top: 0;
+  white-space: nowrap;
+  color: var(--crema);
+  opacity: 0;
+}
+
+.cartel.esta-donando .etiqueta-sin {
+  opacity: 0;
+}
+
+.cartel.esta-donando .etiqueta-con {
+  opacity: 1;
+  transition-delay: 0.4s;
+}
+
+/* ---------- 6. Botón de donar ----------
+   La estrella 3D está en el lienzo, justo detrás. main.js la hace crecer
+   y girar en mouseenter y la devuelve a su sitio en mouseleave. */
+.donar {
+  position: absolute;
+  top: 418px;
+  left: 551px;
+  width: 170px;
+  height: 170px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  font: 800 17px/1.05 var(--fuente-texto);
+  text-align: center;
+  text-transform: uppercase;
+  color: var(--tinta);
+  cursor: pointer;
+  transform: scale(1) rotate(0deg);
+  transition: transform 0.9s var(--salida-suave), color 0.6s ease;
+}
+
+/* main.js cambia transform y color; al entrar, transición rápida con rebote */
+.cartel.esta-donando .donar {
+  transition: transform 0.55s var(--salida-rebote), color 0.3s ease;
+}
+
+.donar:focus-visible {
+  outline: 3px solid var(--crema);
+  outline-offset: 6px;
+}
+
+/* ---------- 7. Pie, branding y créditos ---------- */
+/* El pueblo nevado continúa hasta abajo; un degradado oscuro hace legible el pie */
+.franja {
+  position: absolute;
+  top: 960px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  background: linear-gradient(to bottom,
+    rgba(11, 13, 18, 0) 0%, rgba(11, 13, 18, 0.55) 30%, rgba(11, 13, 18, 0.88) 55%, rgba(11, 13, 18, 0.96) 100%);
+}
+
+.pie {
+  position: absolute;
+  left: var(--margen);
+  right: var(--margen);
+  bottom: 44px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 28px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 241, 230, 0.2);
+}
+
+.pie__mensaje {
+  flex: 1 1 0;
+  min-width: 0;
+  font: 600 13.5px/1.3 var(--fuente-texto);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.7);
+}
+
+/* Llamada a donar: botón dorado con relieve, icono de regalo y flecha */
+.pie__donar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 12px 10px 10px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #ffe7a3 0%, #f6c443 45%, #e09a1f 100%);
+  color: #2a1606;
+  box-shadow:
+    0 12px 28px rgba(224, 154, 31, 0.35),
+    0 2px 0 rgba(120, 70, 10, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    inset 0 -2px 4px rgba(150, 80, 0, 0.25);
+  white-space: nowrap;
+  transition: transform 0.35s var(--salida-rebote), box-shadow 0.35s ease;
+}
+
+.cartel.esta-donando .pie__donar {
+  transform: scale(1.04);
+  box-shadow:
+    0 16px 36px rgba(255, 196, 70, 0.55),
+    0 2px 0 rgba(120, 70, 10, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    inset 0 -2px 4px rgba(150, 80, 0, 0.25);
+}
+
+.pie__donar-icono {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #e8434f, #a8121f 70%);
+  color: #fff4dc;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 3px 8px rgba(120, 10, 20, 0.4);
+}
+
+.pie__donar-texto {
+  display: grid;
+  gap: 3px;
+}
+
+.pie__donar-titulo {
+  font: 800 21px/1 var(--fuente-texto);
+  letter-spacing: -0.015em;
+}
+
+.pie__donar-accion {
+  font: 700 11px/1 var(--fuente-texto);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(42, 22, 6, 0.72);
+}
+
+.pie__donar-flecha {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  margin-left: 4px;
+  border-radius: 50%;
+  background: rgba(42, 22, 6, 0.12);
+  font: 800 17px/1 var(--fuente-texto);
+}
+
+.pie__donar:focus-visible {
+  outline: 2px solid var(--dorado);
+  outline-offset: 4px;
+}
+
+.entidad {
+  display: flex;
+  align-items: center;
+  gap: 26px;
+}
+
+.entidad__separador {
+  width: 1px;
+  height: 64px;
+  background: rgba(255, 241, 230, 0.35);
+}
+
+.entidad__planeta {
+  display: block;
+  width: auto;
+  height: 46px;
+}
+
+/* El logo oficial es blanco sobre transparente */
+.entidad__logo {
+  display: block;
+  width: auto;
+  height: 96px;
+}
+
+.entidad__datos {
+  display: grid;
+  gap: 5px;
+  font: 600 11px/1.25 var(--fuente-texto);
+  white-space: nowrap;
+}
+
+.creditos {
+  position: absolute;
+  left: var(--margen);
+  right: var(--margen);
+  bottom: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font: 600 10px/1 var(--fuente-texto);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 241, 230, 0.45);
+}
+
+.creditos strong {
+  color: rgba(255, 241, 230, 0.85);
+}
+
+.creditos__logo {
+  display: block;
+  width: auto;
+  height: 17px;
+}
+
+/* ---------- 8. Pantallas táctiles y movimiento reducido ---------- */
+@media (hover: none) and (pointer: coarse) {
+  .solo-raton {
+    display: none;
+  }
+
+  .solo-tactil {
+    display: inline;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .donar,
+  .cartel.esta-donando .donar {
+    transition: none;
+  }
+}
+
+/* ---------- Dentro de la web de pósters (iframe) ----------
+   El cartel llena su tarjeta: sin fondo gris, sin sombra y sin márgenes. */
+html.incrustado,
+html.incrustado body {
+  background: transparent;
+}
+
+html.incrustado .cartel {
+  box-shadow: none;
+}
+
+/* sin márgenes: el cartel ocupa exactamente la tarjeta */
+html.incrustado body {
+  display: block;
+  overflow: hidden;
+}
+
+html.incrustado .escenario {
+  margin: 0;
+}
+
+/* ---------- Pantalla de carga: tormenta de nieve ----------
+   Mientras carga, una ventisca nocturna tapa el cartel. Al terminar (.amainando)
+   la niebla se despeja poco a poco, la nieve se calma y aparece el cartel. */
+.carga {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.carga__niebla {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, #1c2638 0%, #3d4f6e 45%, #8197b8 100%);
+  transition: opacity 2.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* bancos de niebla que pasan con el viento */
+.carga__niebla i {
+  position: absolute;
+  width: 140%;
+  height: 45%;
+  left: -20%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(235, 242, 252, 0.7), rgba(235, 242, 252, 0));
+  filter: blur(18px);
+  animation: carga-viento 7s linear infinite;
+}
+
+.carga__niebla i:nth-child(1) { top: 8%; animation-duration: 9s; }
+.carga__niebla i:nth-child(2) { top: 40%; animation-duration: 6s; animation-delay: -3s; opacity: 0.8; }
+.carga__niebla i:nth-child(3) { top: 70%; animation-duration: 8s; animation-delay: -5s; }
+
+@keyframes carga-viento {
+  from { transform: translateX(-30%); }
+  to { transform: translateX(30%); }
+}
+
+.carga__nieve {
+  position: absolute;
+  inset: 0;
+  transition: opacity 3.4s ease 0.8s;
+}
+
+.carga__nieve span {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--t);
+  height: calc(var(--t) * var(--e)); /* estela: los copos rápidos se ven alargados */
+  border-radius: 50%;
+  background: #fff;
+  opacity: var(--o);
+  filter: blur(var(--b));
+  animation: carga-ventisca var(--d) linear var(--r) infinite;
+}
+
+/* los copos cruzan en diagonal, empujados por el viento */
+@keyframes carga-ventisca {
+  from { transform: translate(-60px, -140px) rotate(-32deg); }
+  to { transform: translate(340px, 440px) rotate(-32deg); }
+}
+
+.carga__escena {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  transition: opacity 0.6s ease;
+}
+
+.carga__centro {
+  display: grid;
+  justify-items: center;
+  gap: 22px;
+}
+
+.carga__titulo {
+  font: 800 42px/1 var(--fuente-texto);
+  letter-spacing: -0.02em;
+  color: #ffffff;
+  text-shadow: 0 2px 20px rgba(20, 30, 50, 0.6);
+}
+
+.carga__puntos i {
+  font-style: normal;
+  animation: carga-punto 1.2s infinite;
+}
+
+.carga__puntos i:nth-child(2) { animation-delay: 0.2s; }
+.carga__puntos i:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes carga-punto {
+  0%, 20% { opacity: 0; }
+  50%, 100% { opacity: 1; }
+}
+
+.carga__barra {
+  width: 320px;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.2);
+  overflow: hidden;
+}
+
+.carga__barra span {
+  display: block;
+  width: 4%;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #ffffff, #ffe7a3);
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.8);
+  transition: width 0.5s ease;
+}
+
+/* la tormenta amaina: primero el texto, luego la niebla y al final los copos */
+.carga.amainando .carga__escena { opacity: 0; }
+.carga.amainando .carga__niebla { opacity: 0; }
+.carga.amainando .carga__nieve { opacity: 0; }
+.carga.amainando .carga__nieve span { animation-duration: calc(var(--d) * 2.5); }
+
+.cartel.esta-listo .carga {
+  visibility: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .carga__nieve span,
+  .carga__niebla i,
+  .carga__puntos i {
+    animation: none;
+  }
+}
