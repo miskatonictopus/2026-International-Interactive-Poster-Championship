@@ -1,0 +1,590 @@
+:root {
+  --midnight: #040915;
+  --night: #0b1736;
+  --dusk: #1a3570;
+  --ice: #cfe0ff;
+  --snow: #f4f7ff;
+  --berry: #e0303f;
+  --gold: #f0bb52;
+  --outline: #071230;
+  --margin: 40px;
+  --sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --serif: "Fraunces", Georgia, "Times New Roman", serif;
+  --display: "Anton", "Impact", "Arial Narrow", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+}
+
+/* El azul de la noche es el fondo de toda la página: el cartel no tiene bordes */
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse 70% 45% at 50% 90%, rgba(70, 110, 210, 0.35) 0%, transparent 70%),
+    linear-gradient(180deg, var(--midnight) 0%, var(--night) 45%, var(--dusk) 100%);
+  background-attachment: fixed;
+}
+
+/* ---------- Escenario: ocupa el tamaño ya escalado del cartel ---------- */
+
+.stage {
+  position: relative;
+  flex: none;
+  width: 848px;
+  height: 1200px;
+}
+
+.poster {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 848px;
+  height: 1200px;
+  overflow: hidden;
+  color: var(--snow);
+  transform-origin: top left;
+}
+
+/* ---------- Cielo ---------- */
+
+/* Estrellas que titilan */
+.sky {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 30px 40px, rgba(255, 255, 255, 0.9) 1.5px, transparent 2.5px),
+    radial-gradient(circle at 120px 100px, rgba(207, 224, 255, 0.7) 1px, transparent 2px),
+    radial-gradient(circle at 190px 30px, rgba(240, 187, 82, 0.8) 1.6px, transparent 2.6px);
+  background-position: 0 0, 40px 20px, 90px 60px;
+  background-size: 210px 170px, 260px 190px, 330px 240px;
+  -webkit-mask-image: linear-gradient(180deg, #000 40%, transparent 75%);
+  mask-image: linear-gradient(180deg, #000 40%, transparent 75%);
+  pointer-events: none;
+  animation: twinkle 3.2s ease-in-out infinite alternate;
+}
+
+/* Aurora boreal muy suave que ondula detrás de la guirnalda */
+.aurora {
+  position: absolute;
+  top: 150px;
+  left: -100px;
+  width: 1048px;
+  height: 360px;
+  background:
+    radial-gradient(ellipse 30% 40% at 25% 50%, rgba(80, 220, 180, 0.16) 0%, transparent 70%),
+    radial-gradient(ellipse 35% 35% at 60% 40%, rgba(120, 160, 255, 0.18) 0%, transparent 70%),
+    radial-gradient(ellipse 25% 30% at 85% 60%, rgba(190, 120, 255, 0.12) 0%, transparent 70%);
+  filter: blur(10px);
+  pointer-events: none;
+  animation: aurora 14s ease-in-out infinite alternate;
+}
+
+/* Luna llena con cráteres suaves (main.js la desplaza con el cursor) */
+.moon {
+  position: absolute;
+  top: 470px;
+  left: 70px;
+  width: 116px;
+  height: 116px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 34% 38%, rgba(160, 175, 205, 0.45) 0 10px, transparent 11px),
+    radial-gradient(circle at 64% 62%, rgba(160, 175, 205, 0.4) 0 15px, transparent 16px),
+    radial-gradient(circle at 62% 28%, rgba(160, 175, 205, 0.35) 0 6px, transparent 7px),
+    radial-gradient(circle at 40% 40%, #fffdf4 0%, #e8ecf7 60%, #c9d3ea 100%);
+  box-shadow: 0 0 40px 8px rgba(220, 232, 255, 0.4), 0 0 140px 40px rgba(160, 190, 255, 0.16);
+  pointer-events: none;
+  will-change: transform;
+}
+
+/* Resplandor detrás de la bola de nieve */
+.glow {
+  position: absolute;
+  top: 360px;
+  left: 50%;
+  width: 520px;
+  height: 400px;
+  margin-left: -260px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(240, 187, 82, 0.2) 0%, rgba(120, 160, 255, 0.08) 45%, transparent 68%);
+  opacity: 0.8;
+  pointer-events: none;
+  transition: opacity 0.6s linear, transform 0.6s ease;
+}
+
+/* ---------- Trineo de Papá Noel (main.js lo hace cruzar el cielo) ---------- */
+
+.sleigh {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 190px;
+  cursor: pointer;
+  opacity: 0.92;
+  filter: drop-shadow(0 0 6px rgba(220, 232, 255, 0.35));
+  transition: filter 0.4s ease;
+  will-change: transform;
+}
+
+.sleigh svg {
+  display: block;
+  width: 100%;
+  overflow: visible;
+}
+
+.sleigh.is-hovered {
+  filter: drop-shadow(0 0 14px rgba(240, 187, 82, 0.9));
+}
+
+/* Las patas, las riendas y el brazo de Papá Noel se animan dentro del SVG */
+.sleigh-nose {
+  filter: drop-shadow(0 0 4px #ff3a3a);
+  animation: twinkle 0.8s ease-in-out infinite alternate;
+}
+
+.sleigh-shout {
+  position: absolute;
+  top: -30px;
+  left: 105px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  background: var(--snow);
+  color: var(--berry);
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 600;
+  font-size: 18px;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateY(8px) scale(0.6);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: none;
+}
+
+.sleigh-shout.is-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+/* ---------- Cabecera: branding y fecha ---------- */
+
+.header {
+  position: absolute;
+  top: 28px;
+  right: var(--margin);
+  left: var(--margin);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+/* La cabecera deja pasar el ratón (al trineo que vuela detrás); solo el logotipo lo recibe */
+.header {
+  pointer-events: none;
+}
+
+.brand {
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  cursor: default;
+  transition: transform 0.4s cubic-bezier(0.2, 1.4, 0.4, 1), filter 0.3s linear;
+}
+
+.brand-logo {
+  display: block;
+  width: 102px;
+  height: 140px;
+  transition: transform 0.5s cubic-bezier(0.2, 1.6, 0.4, 1);
+}
+
+/* Empresa colaboradora (PlanetaFP) en el pie del cartel */
+.sponsor {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 8px;
+  letter-spacing: 0.2em;
+}
+
+.sponsor-logo {
+  display: block;
+  width: auto;
+  height: 22px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+}
+
+.brand-name {
+  font-family: var(--sans);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: 0.16em;
+  text-align: center;
+  text-transform: uppercase;
+  color: var(--ice);
+}
+
+/* Fecha: un «21» gigante solo con contorno y el mes en dorado */
+.date {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  pointer-events: none;
+}
+
+.date-day,
+.date-month {
+  display: block;
+  will-change: transform;
+}
+
+.date-day {
+  margin-top: -14px;
+  font-family: var(--display);
+  font-size: 210px;
+  font-weight: 400;
+  line-height: 0.92;
+  letter-spacing: 0.02em;
+  color: transparent;
+  -webkit-text-stroke: 3px var(--snow);
+  text-shadow: 0 0 34px rgba(150, 190, 255, 0.55);
+}
+
+.date-month {
+  margin-top: -4px;
+  font-family: var(--serif);
+  font-size: 40px;
+  font-style: italic;
+  line-height: 1;
+  color: var(--gold);
+  text-shadow: 0 0 18px rgba(240, 187, 82, 0.45);
+}
+
+/* ---------- Mensaje, centrado bajo el título ---------- */
+
+.message {
+  position: absolute;
+  top: 1084px;
+  left: 50%;
+  width: 740px;
+  margin-left: -370px;
+  font-family: var(--serif);
+  font-size: 17px;
+  font-style: italic;
+  line-height: 1.3;
+  text-align: center;
+  color: var(--snow);
+  text-shadow: 0 2px 10px rgba(0, 0, 20, 0.7);
+  pointer-events: none;
+}
+
+.message b {
+  display: block;
+  margin-top: 2px;
+  font-weight: 600;
+  color: var(--gold);
+}
+
+/* ---------- Corona con el sello del donativo ---------- */
+
+.badge {
+  position: absolute;
+  top: 392px;
+  left: 595px;
+  width: 190px;
+  height: 202px;
+}
+
+.wreath {
+  display: block;
+  width: 190px;
+  height: 202px;
+  filter: drop-shadow(0 6px 12px rgba(0, 0, 20, 0.55));
+  cursor: pointer;
+}
+
+/* Solo el aro de hojas y bayas gira */
+.wreath-ring {
+  transform-box: view-box;
+  transform-origin: 80px 80px;
+  animation: spin 16s linear infinite;
+}
+
+/* El lazo da un salto y se balancea al hacer clic */
+.wreath-bow {
+  transform-box: view-box;
+  transform-origin: 80px 135px;
+}
+
+.wreath-bow.is-popping {
+  animation: bow-pop 0.9s cubic-bezier(0.2, 1.4, 0.4, 1);
+}
+
+/* Sello dorado en el hueco de la corona (main.js cambia su escala, giro y colores) */
+.seal {
+  position: absolute;
+  top: 47px;
+  left: 47px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  font-family: var(--serif);
+  font-style: italic;
+  line-height: 1.05;
+  text-align: center;
+  color: var(--outline);
+  background-color: var(--gold);
+  background-image: radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.5), transparent 55%);
+  box-shadow: 0 0 0 3px rgba(240, 187, 82, 0.35), 0 0 24px rgba(240, 187, 82, 0.5), 0 6px 12px rgba(0, 0, 20, 0.5);
+  transform: rotate(-8deg);
+  cursor: pointer;
+  transition: transform 0.45s cubic-bezier(0.2, 1.6, 0.4, 1), background-color 0.3s linear, color 0.3s linear, box-shadow 0.3s linear;
+}
+
+/* Anillo punteado interior, como un sello de lacre */
+.seal::before {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border: 1.5px dashed currentColor;
+  border-radius: 50%;
+  opacity: 0.45;
+}
+
+.seal-small {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.seal-amount {
+  font-family: var(--display);
+  font-size: 30px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 1.1;
+}
+
+/* ---------- Capas de dibujo ---------- */
+
+.scene,
+.snow {
+  position: absolute;
+  inset: 0;
+  width: 848px;
+  height: 1200px;
+  /* main.js detecta los objetos 3D con raycasting desde el cartel */
+  pointer-events: none;
+}
+
+/* ---------- Etiquetas de los objetos 3D (las crea main.js) ---------- */
+
+.tag {
+  position: absolute;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 170px;
+  padding: 9px 14px;
+  border: 1px solid rgba(207, 224, 255, 0.35);
+  border-top: 3px solid var(--gold);
+  border-radius: 8px;
+  background: rgba(6, 13, 36, 0.9);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+  font-family: var(--sans);
+  font-size: 13px;
+  text-align: center;
+  white-space: nowrap;
+  translate: -50% -100%;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.25s linear, transform 0.35s cubic-bezier(0.2, 1.4, 0.4, 1);
+  pointer-events: none;
+}
+
+.tag strong {
+  font-family: var(--serif);
+  font-size: 20px;
+  font-style: italic;
+  font-weight: 600;
+  color: var(--gold);
+}
+
+.tag.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* ---------- Título gigante: escenario de los niños y de la nieve ---------- */
+
+.title {
+  position: absolute;
+  top: 786px;
+  right: var(--margin);
+  left: var(--margin);
+  font-family: var(--display);
+  font-weight: 400;
+  line-height: 0.9;
+  letter-spacing: 0.01em;
+  color: var(--gold);
+  text-align: center;
+  text-shadow: 0 6px 0 var(--outline), 0 16px 28px rgba(0, 0, 20, 0.6);
+  cursor: default;
+}
+
+.title-line {
+  display: table;
+  margin: 0 auto;
+  white-space: nowrap;
+}
+
+.title-line--accent {
+  color: var(--berry);
+}
+
+.letter {
+  display: inline-block;
+  transition: transform 0.45s cubic-bezier(0.2, 1.4, 0.4, 1), color 0.3s linear;
+}
+
+/* El espacio entre palabras también se estrecha */
+.letter-space {
+  width: 0.22em;
+}
+
+.footer {
+  position: absolute;
+  right: 0;
+  bottom: 22px;
+  left: 0;
+  font-family: var(--sans);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  text-align: center;
+  text-transform: uppercase;
+  color: var(--ice);
+  opacity: 0.75;
+  pointer-events: none;
+}
+
+/* ---------- Botón de sonido ---------- */
+
+.sound {
+  position: absolute;
+  right: 20px;
+  bottom: 20px;
+  z-index: 2;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 2px solid var(--gold);
+  border-radius: 50%;
+  font-family: var(--sans);
+  font-size: 17px;
+  line-height: 1;
+  color: var(--gold);
+  background: var(--night);
+  cursor: pointer;
+}
+
+.sound[aria-pressed="false"] {
+  opacity: 0.45;
+  text-decoration: line-through;
+}
+
+/* ---------- Pantalla de carga ---------- */
+
+.loader {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  font-family: var(--serif);
+  font-size: 26px;
+  font-style: italic;
+  background: rgba(6, 13, 36, 0.96);
+  transition: opacity 0.6s linear;
+}
+
+.loader-star {
+  font-size: 54px;
+  color: var(--ice);
+  animation: spin 2.4s linear infinite;
+}
+
+.loader.is-done {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.loader.is-error {
+  padding: 60px;
+  text-align: center;
+}
+
+/* ---------- Animaciones ---------- */
+
+@keyframes twinkle {
+  from { opacity: 0.55; }
+  to { opacity: 1; }
+}
+
+@keyframes aurora {
+  from { transform: translateX(-40px) skewX(-4deg); opacity: 0.7; }
+  to { transform: translateX(40px) skewX(4deg); opacity: 1; }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes bow-pop {
+  0% { transform: scale(1) rotate(0); }
+  20% { transform: translateY(-10px) scale(1.35) rotate(-14deg); }
+  40% { transform: translateY(-4px) scale(1.2) rotate(12deg); }
+  60% { transform: scale(1.1) rotate(-8deg); }
+  80% { transform: scale(1.04) rotate(4deg); }
+  100% { transform: scale(1) rotate(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tag,
+  .letter,
+  .glow,
+  .brand,
+  .brand-logo,
+  .seal {
+    transition-duration: 0.01s;
+  }
+
+  .loader-star,
+  .sleigh-nose,
+  .sky,
+  .aurora,
+  .wreath-ring,
+  .wreath-bow.is-popping {
+    animation: none;
+  }
+}
