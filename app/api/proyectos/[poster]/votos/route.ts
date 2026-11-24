@@ -2,7 +2,13 @@ import { randomUUID } from "node:crypto"
 import { NextRequest, NextResponse } from "next/server"
 
 import { posters } from "@/lib/posters"
-import { readVotes, saveVote, type Votes, voteTotals } from "@/lib/votes"
+import {
+  readVotes,
+  saveVote,
+  type Votes,
+  voteTotals,
+  votingIsOpen,
+} from "@/lib/votes"
 
 type Context = { params: Promise<{ poster: string }> }
 
@@ -20,6 +26,7 @@ function summary(votes: Votes, poster: string, voter: string) {
     {
       ...voteTotals(votes, poster),
       rating: votes[poster]?.[voter] ?? null,
+      open: votingIsOpen(),
     },
     { headers: { "Cache-Control": "private, no-store" } }
   )
@@ -53,6 +60,8 @@ export async function PUT(request: NextRequest, { params }: Context) {
   if (!posters.some(({ id }) => id === poster)) {
     return new Response(null, { status: 404 })
   }
+
+  if (!votingIsOpen()) return new Response(null, { status: 423 })
 
   const voter = getVoter(request)
   if (!voter) return new Response(null, { status: 409 })

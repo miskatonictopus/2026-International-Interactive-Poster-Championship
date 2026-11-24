@@ -14,6 +14,16 @@ const blobPath =
     : "itaca/votes.json"
 let localWrites = Promise.resolve()
 
+/**
+ * Solo se vota en producción. En local o en las previews se puede forzar con
+ * VOTING_OPEN=1 para hacer pruebas (los votos van a otro almacén).
+ */
+export function votingIsOpen() {
+  return (
+    process.env.VERCEL_ENV === "production" || process.env.VOTING_OPEN === "1"
+  )
+}
+
 function blobIsConfigured() {
   if (process.env.BLOB_STORE_ID || process.env.BLOB_READ_WRITE_TOKEN)
     return true
@@ -27,7 +37,9 @@ function blobIsConfigured() {
 
 async function readLocalVotes(): Promise<Votes> {
   try {
-    return JSON.parse(await readFile(/* turbopackIgnore: true */ voteFile, "utf8"))
+    return JSON.parse(
+      await readFile(/* turbopackIgnore: true */ voteFile, "utf8")
+    )
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === "ENOENT") return {}
     throw error

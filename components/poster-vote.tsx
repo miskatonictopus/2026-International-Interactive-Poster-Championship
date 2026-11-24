@@ -5,7 +5,12 @@ import { type FormEvent, useContext, useEffect, useState } from "react"
 import { cn } from "@/lib/utils"
 import { LiveVoteTotals } from "./live-vote-totals"
 
-type VoteSummary = { total: number; points: number; rating: number | null }
+type VoteSummary = {
+  total: number
+  points: number
+  rating: number | null
+  open: boolean
+}
 
 const pointsFormat = new Intl.NumberFormat("es-ES", {
   maximumFractionDigits: 2,
@@ -45,8 +50,13 @@ export function PosterVote({
   }, [endpoint, retry])
 
   const selected = draftRating ?? summary?.rating ?? 0
+  const closed = summary !== null && !summary.open
   const canSubmit =
-    summary !== null && selected > 0 && selected !== summary.rating && !saving
+    summary !== null &&
+    summary.open &&
+    selected > 0 &&
+    selected !== summary.rating &&
+    !saving
 
   async function submitVote(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -61,6 +71,8 @@ export function PosterVote({
         body: JSON.stringify({ rating: selected }),
       })
       if (response.status === 409) setSummary(null)
+      if (response.status === 423)
+        setSummary((loaded) => loaded && { ...loaded, open: false })
       if (!response.ok) throw new Error("No se pudo guardar el voto")
       const { rating }: VoteSummary = await response.json()
       setSummary((loaded) => loaded && { ...loaded, rating })
@@ -99,7 +111,7 @@ export function PosterVote({
                 type="button"
                 aria-label={rating === 1 ? "1 punto" : `${rating} puntos`}
                 aria-pressed={rating === selected}
-                disabled={!summary}
+                disabled={!summary || closed}
                 aria-disabled={saving || undefined}
                 className="flex w-[6cqw] flex-col items-center gap-[0.6cqw] rounded-sm focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-neutral-950 enabled:cursor-pointer"
                 onPointerEnter={(event) => {
@@ -155,6 +167,11 @@ export function PosterVote({
           </span>
         </div>
       </div>
+      {closed && (
+        <p className="mt-1 text-right text-[length:2.8cqw] text-neutral-500">
+          La votación solo está abierta en la web oficial.
+        </p>
+      )}
       <p
         role="status"
         className={
