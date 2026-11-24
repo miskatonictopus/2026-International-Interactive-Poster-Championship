@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cap nen hi juga · Associació Educativa Itaca</title>
+    <meta name="description" content="Cartell interactiu de la campanya de Nadal de l'Associació Educativa Itaca. Joguines per a infants en risc d'exclusió. 21 de desembre.">
+
+    <!-- Evita la petición a /favicon.ico (y su 404 en consola) -->
+    <link rel="icon" href="data:,">
+
+    <!-- Tipografías, en una sola petición (ambas OFL): Anton para el titular y la cifra
+         del estado, Saira Condensed para la microtipografía -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Saira+Condensed:wght@600;700&display=swap">
+
+    <!-- Estilos del cartel -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Lógica e interacciones (defer: se ejecuta cuando el HTML ya está cargado) -->
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <main class="marco">
+        <!-- Lienzo de diseño 848 × 1200. Se escala completo desde JS, no se reflowea.
+             El degradado direccional del fondo es el background de .escenario (style.css) -->
+        <div class="escenario" id="escenario">
+
+            <!-- 0. Nevada de fondo: copos de seis puntas que caen sin parar sobre el muro,
+                 como lluvia, muy tenues. Detrás de todo: la bola los tapa (script.js, pluja) -->
+            <canvas class="neu-fons" id="neu-fons" width="848" height="1200" aria-hidden="true"></canvas>
+
+            <!-- 1–5. Fondo: haz de luz, repisa, bola de fondo y polvo.
+                 El muro (degradado direccional) es el background de .escenario -->
+            <svg class="capa capa-fondo" viewBox="0 0 848 1200" width="848" height="1200" aria-hidden="true">
+                <defs>
+                    <linearGradient id="grad-haz" x1="0.12" y1="0" x2="0.62" y2="1">
+                        <stop offset="0%" stop-color="#EAF1EA" stop-opacity="0.34"/>
+                        <stop offset="40%" stop-color="#EAF1EA" stop-opacity="0.15"/>
+                        <stop offset="100%" stop-color="#EAF1EA" stop-opacity="0"/>
+                    </linearGradient>
+                    <linearGradient id="grad-haz-fino" x1="0.12" y1="0" x2="0.62" y2="1">
+                        <stop offset="0%" stop-color="#F4F8F4" stop-opacity="0.30"/>
+                        <stop offset="55%" stop-color="#F4F8F4" stop-opacity="0.10"/>
+                        <stop offset="100%" stop-color="#F4F8F4" stop-opacity="0"/>
+                    </linearGradient>
+                    <filter id="muy-borroso" x="-25%" y="-25%" width="150%" height="150%">
+                        <feGaussianBlur stdDeviation="9"/>
+                    </filter>
+                </defs>
+
+                <!-- 2. Haz de luz volumétrico: una banda ancha y suave y otra estrecha y más clara.
+                     Dos grupos porque son dos transformaciones distintas:
+                       #haz-parallax → translate ±12 px contrario al cursor (atributo, desde JS)
+                       #haz-luz      → barrido de ±3,5° (animación CSS)
+                     Si fueran el mismo elemento, la animación CSS anularía el atributo.
+                     Los polígonos empiezan en y = −110 (prolongando sus lados) para que ni el
+                     giro ni el parallax dejen ver su borde superior. -->
+                <g id="haz-parallax">
+                    <g id="haz-luz">
+                        <polygon points="-130,-110 270,-110 820,1100 420,1100" fill="url(#grad-haz)"/>
+                        <polygon points="-3,-110 127,-110 600,1100 470,1100" fill="url(#grad-haz-fino)"/>
+                    </g>
+                </g>
+
+                <!-- 3. Repisa: frente, canto que recibe la luz y línea del filo -->
+                <g id="repisa">
+                    <rect class="repisa-frente" x="0" y="1100" width="848" height="100"/>
+                    <rect class="repisa-canto" x="0" y="1100" width="848" height="9"/>
+                    <line class="repisa-filo" x1="0" y1="1100" x2="848" y2="1100"/>
+                </g>
+
+                <!-- 4. Segunda bola, olvidada al fondo: recortada por el borde y muy desenfocada -->
+                <g id="bola-fondo" filter="url(#muy-borroso)" opacity="0.22">
+                    <ellipse cx="890" cy="1094" rx="138" ry="15" fill="#2E4034" opacity="0.35"/>
+                    <rect x="828" y="1042" width="124" height="52" rx="10" fill="#5A4433"/>
+                    <circle cx="890" cy="945" r="155" fill="#A9B8B0"/>
+                    <path d="M 760 880 A 155 155 0 0 1 846 800 L 852 818 A 138 138 0 0 0 776 890 Z"
+                          fill="#EAF1EA" opacity="0.25"/>
+                </g>
+
+                <!-- 5. Polvo: las 26 motas las genera script.js; brillan al cruzar el haz -->
+                <g id="polvo"></g>
+            </svg>
+
+            <!-- 6. Resplandor cálido de la bola (opacidad desde JS según lo limpia que esté) -->
+            <div class="resplandor" id="resplandor"></div>
+
+            <!-- 6–7. Cáustica y sombras proyectadas sobre la repisa -->
+            <svg class="capa capa-repisa" viewBox="0 0 848 1200" width="848" height="1200" aria-hidden="true">
+                <defs>
+                    <radialGradient id="grad-caustica">
+                        <stop offset="0%" stop-color="#DCAC61" stop-opacity="0.50"/>
+                        <stop offset="42%" stop-color="#C98F3C" stop-opacity="0.17"/>
+                        <stop offset="100%" stop-color="#C98F3C" stop-opacity="0"/>
+                    </radialGradient>
+                </defs>
+                <!-- Cáustica: la luz que atraviesa la bola y se concentra en la repisa (crece al limpiar) -->
+                <ellipse class="caustica" id="caustica" cx="482" cy="1098" rx="250" ry="26"/>
+                <ellipse class="sombra-larga" id="sombra-larga" cx="486" cy="1104" rx="252" ry="16"/>
+                <ellipse class="sombra-base" cx="440" cy="1102" rx="176" ry="17"/>
+            </svg>
+
+            <!-- 5. Base de la bola (assets/base-madera.webp) + oclusión en la unión con el cristal -->
+            <div class="img-slot" id="base-madera">
+                <!-- Vector provisional: oculto por CSS ahora que hay imagen -->
+                <svg class="vector-provisional" viewBox="262 1014 324 86" aria-hidden="true">
+                    <rect class="madera" x="274" y="1030" width="300" height="70" rx="12"/>
+                    <rect class="labio" x="262" y="1014" width="324" height="22" rx="11"/>
+                    <rect class="zocalo" x="274" y="1078" width="300" height="22" rx="11"/>
+                    <rect class="labio-luz" x="262" y="1014" width="324" height="6" rx="3"/>
+                </svg>
+                <!-- La oclusión va aparte para que se vea también sobre la imagen -->
+                <svg class="oclusion-base" viewBox="262 1014 324 86" aria-hidden="true">
+                    <ellipse class="oclusion" cx="424" cy="1028" rx="156" ry="22"/>
+                </svg>
+            </div>
+
+            <!-- 6–18. La bola: 770 × 770 en left 39, top 285. Aquí van los listeners.
+                 .bola NO se mueve nunca: recibe los eventos y lleva el clip-path.
+                 Lo que se inclina hacia el cursor es .bola-inclinable, con todas las capas
+                 visuales dentro; su fondo (style.css) es el cristal con degradado direccional -->
+            <div class="bola" id="bola" role="img"
+                 aria-label="Bola de neu coberta de gebre, amb la part baixa d'un arbre de Nadal a dins. En netejar-la apareixen sis joguines.">
+                <div class="bola-inclinable" id="bola-inclinable">
+
+                    <!-- 7. Escena interior refractada. script.js la compone en un canvas de 1040 × 1040
+                         (radio 520, porque la lente muestrea fuera del círculo) en este orden:
+                           assets/fondo.webp → la parte baja del árbol, con sus bolas, luces y
+                                               regalos, DIFUMINADA (blur): es el fondo, no compite
+                                               con los juguetes, que van nítidos delante
+                           este SVG          → la duna delantera, que tapa el borde inferior de la foto
+                         y después la refracta. El SVG solo se ve mientras tanto.
+                         El montículo y el suelo vectoriales ya no están: la foto trae su suelo nevado.
+                         ⚠ Colores como atributos: este SVG se convierte en imagen para el canvas
+                         y una imagen no ve los estilos de style.css. -->
+                    <div id="escena-interior">
+                        <svg id="escena-vector" xmlns="http://www.w3.org/2000/svg"
+                             viewBox="-96 150 1040 1040" width="1040" height="1040" aria-hidden="true">
+                            <defs>
+                                <!-- Nieve de la foto en sombra: gris cálido, no el verde pálido de antes -->
+                                <linearGradient id="luz-duna" x1="15%" y1="0%" x2="85%" y2="100%">
+                                    <stop offset="0%" stop-color="#C9C2BA"/>
+                                    <stop offset="60%" stop-color="#A69E96"/>
+                                    <stop offset="100%" stop-color="#7A736C"/>
+                                </linearGradient>
+                            </defs>
+
+                            <!-- Duna delantera: baja en el centro (el cristal curva). La curva se
+                                 prolonga en recta hasta x = −96 / 944 y y = 1190 -->
+                            <path d="M -96 862 L 20 880 Q 424 944 828 880 L 944 862 L 944 1190 L -96 1190 Z" fill="url(#luz-duna)"/>
+                            <path d="M -96 862 L 20 880 Q 424 944 828 880 L 944 862 L 944 870 L 828 888 Q 424 952 20 888 L -96 870 Z"
+                                  fill="#E2DCD3" opacity="0.6"/>
+                        </svg>
+                        <canvas id="escena-refractada" width="1040" height="1040"></canvas>
+                    </div>
+
+                    <!-- 8. Nieve lejana -->
+                    <canvas id="nieve-fondo" width="770" height="770"></canvas>
+
+                    <!-- 9. Sombras de contacto (coordenadas del cartel): bajo el pie de los juguetes
+                         de abajo, que están en el suelo (pilota, tren y robot). Nunca rotan; crecen
+                         y se aclaran cuando el juguete sube (script.js). Los de arriba (ós,
+                         trompeta e ioiò) flotan o cuelgan: no llevan -->
+                    <svg class="capa-bola sombras-contacto" viewBox="39 285 770 770" aria-hidden="true">
+                        <ellipse class="sombra-contacto" id="sombra-robot" cx="275" cy="918" rx="42" ry="8"/>
+                        <ellipse class="sombra-contacto" id="sombra-tren" cx="487" cy="857" rx="165" ry="11"/>
+                        <ellipse class="sombra-contacto" id="sombra-pilota" cx="427" cy="1001" rx="66" ry="10"/>
+                    </svg>
+
+                    <!-- 9b. Cordel del ioiò: baja de una rama hasta el eje. No gira con el ioiò
+                         (script.js mueve su extremo inferior en cada fotograma) -->
+                    <svg class="capa-bola cordill" viewBox="39 285 770 770" aria-hidden="true">
+                        <line id="cordill-ioio" x1="689" y1="572" x2="689" y2="649"/>
+                    </svg>
+
+                    <!-- 10. Juguetes (divs del DOM, sin refractar). Cada uno con su animación
+                         (script.js). La imagen la pinta el .joguina-hover de dentro.
+                         Dos bandas, grandes y muy juntos (la bola está llena):
+                           arriba → ós · trompeta · ioiò
+                           abajo  → robot · tren (largo, cruzando por el centro) · pilota (delante)
+                         Orden de pintado, de atrás a delante:
+                           ós → trompeta → ioiò → robot → tren → pilota -->
+                    <!-- assets/juguete-oso.webp -->
+                    <div class="img-slot joguina" id="joguina-os">
+                        <div class="joguina-hover"></div>
+                    </div>
+
+                    <!-- assets/trompeta.webp (cuelga de una rama) -->
+                    <div class="img-slot joguina" id="joguina-trompeta">
+                        <div class="joguina-hover"></div>
+                    </div>
+
+                    <!-- Ioiò: vectorial (no hay foto). Con franjas asimétricas para que se
+                         vea girar: un disco liso girando parece quieto -->
+                    <div class="img-slot joguina" id="joguina-ioio">
+                        <div class="joguina-hover">
+                            <svg viewBox="-61 -61 122 122" width="122" height="122">
+                                <defs>
+                                    <radialGradient id="ioio-cos" cx="38%" cy="32%" r="72%">
+                                        <stop offset="0%" stop-color="#E4584A"/>
+                                        <stop offset="55%" stop-color="#B3302A"/>
+                                        <stop offset="100%" stop-color="#5E1612"/>
+                                    </radialGradient>
+                                    <radialGradient id="ioio-brill" cx="32%" cy="26%" r="40%">
+                                        <stop offset="0%" stop-color="#FFF4E4" stop-opacity=".55"/>
+                                        <stop offset="100%" stop-color="#FFF4E4" stop-opacity="0"/>
+                                    </radialGradient>
+                                </defs>
+                                <circle r="58" fill="url(#ioio-cos)"/>
+                                <circle r="58" fill="none" stroke="#3A0D0A" stroke-width="2" opacity=".6"/>
+                                <!-- Franjas: tres sectores claros, como las de un ioiò de madera pintado -->
+                                <g fill="#E8DFCF" opacity=".85">
+                                    <path d="M0 0 L0 -50 A50 50 0 0 1 25 -43.3 Z"/>
+                                    <path d="M0 0 L43.3 25 A50 50 0 0 1 25 43.3 Z"/>
+                                    <path d="M0 0 L-43.3 25 A50 50 0 0 1 -50 0 Z"/>
+                                </g>
+                                <circle r="34" fill="none" stroke="#5E1612" stroke-width="3" opacity=".7"/>
+                                <circle r="15" fill="#C9A15E"/>
+                                <circle r="15" fill="none" stroke="#6B4F3A" stroke-width="2"/>
+                                <circle r="4" fill="#6B4F3A"/>
+                                <circle r="58" fill="url(#ioio-brill)"/>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- assets/robot.webp -->
+                    <div class="img-slot joguina" id="joguina-robot">
+                        <div class="joguina-hover"></div>
+                    </div>
+
+                    <!-- assets/tren.webp (locomotora con dos vagones) -->
+                    <div class="img-slot joguina" id="joguina-tren">
+                        <div class="joguina-hover"></div>
+                    </div>
+
+                    <!-- assets/pelota.webp (pelota de fútbol de cuero) -->
+                    <div class="img-slot joguina" id="joguina-pilota">
+                        <div class="joguina-hover"></div>
+                    </div>
+
+                    <!-- 11. Nieve media -->
+                    <canvas id="nieve-media" width="770" height="770"></canvas>
+
+                    <!-- 12. Sombra interior direccional (debajo de la nieve cercana) -->
+                    <svg class="capa-bola sombra-interior" viewBox="39 285 770 770" aria-hidden="true">
+                        <defs>
+                            <radialGradient id="grad-sombra-interior" cx="31%" cy="25%" r="86%">
+                                <stop offset="38%" stop-color="#55685D" stop-opacity="0"/>
+                                <stop offset="78%" stop-color="#55685D" stop-opacity="0.22"/>
+                                <stop offset="100%" stop-color="#3E5046" stop-opacity="0.55"/>
+                            </radialGradient>
+                        </defs>
+                        <rect x="39" y="285" width="770" height="770" fill="url(#grad-sombra-interior)"/>
+                    </svg>
+
+                    <!-- 13. Nieve cercana: grande, desenfocada, pegada al cristal -->
+                    <canvas id="nieve-cerca" width="770" height="770"></canvas>
+
+                    <!-- 14–15. Anillo de grosor, medias lunas, brillo suave y especulares -->
+                    <svg class="capa-bola cristal" viewBox="39 285 770 770" aria-hidden="true">
+                        <defs>
+                            <linearGradient id="grad-anillo" x1="18%" y1="8%" x2="82%" y2="96%">
+                                <stop offset="0%" stop-color="#EDF2EC" stop-opacity="0.30"/>
+                                <stop offset="30%" stop-color="#A3B4A8" stop-opacity="0.08"/>
+                                <stop offset="68%" stop-color="#3E5046" stop-opacity="0.24"/>
+                                <stop offset="100%" stop-color="#2C3B33" stop-opacity="0.45"/>
+                            </linearGradient>
+                            <radialGradient id="grad-brillo-suave">
+                                <stop offset="0%" stop-color="#EDE4D4" stop-opacity="0.22"/>
+                                <stop offset="100%" stop-color="#EDE4D4" stop-opacity="0"/>
+                            </radialGradient>
+                        </defs>
+                        <!-- Grosor del cristal: cubre los 34 px interiores del borde -->
+                        <circle class="anillo-cristal" cx="424" cy="670" r="368"/>
+                        <!-- Luz directa (arriba izquierda) y luz de rebote (abajo derecha): no un filo uniforme -->
+                        <path class="luna-luz" d="M 45 603 A 385 385 0 0 1 357 291 L 363 323 A 352 352 0 0 0 77 609 Z"/>
+                        <path class="luna-rebote" d="M 786 802 A 385 385 0 0 1 491 1049 L 487 1027 A 362 362 0 0 0 764 794 Z"/>
+                        <!-- Brillos que se mueven en sentido contrario al cursor -->
+                        <g id="brillo">
+                            <ellipse class="brillo-suave" cx="248" cy="462" rx="96" ry="158" transform="rotate(-28 248 462)"/>
+                            <ellipse class="especular-grande" cx="232" cy="408" rx="16" ry="36" transform="rotate(-28 232 408)"/>
+                            <ellipse class="especular-pequeno" cx="286" cy="352" rx="7" ry="13" transform="rotate(-28 286 352)"/>
+                        </g>
+                    </svg>
+
+                    <!-- 17b. Cristales de hielo apartados a los lados del trazo -->
+                    <canvas id="humedad" width="770" height="770"></canvas>
+
+                    <!-- 18. Canvas de escarcha (sin refractar: está sobre el cristal, no dentro) -->
+                    <canvas id="escarcha" width="770" height="770"></canvas>
+                </div>
+            </div>
+
+            <!-- 16. Borde exterior del cristal (fuera del recorte) -->
+            <svg class="capa capa-borde" viewBox="0 0 848 1200" width="848" height="1200" aria-hidden="true">
+                <circle class="borde-cristal" cx="424" cy="670" r="385"/>
+            </svg>
+
+            <!-- 20. Titular brutalista en Anton, estirado en vertical: CAP NEN en rojo sobre el
+                 fondo oscuro. HI JUGA cambia de color con la escarcha: verde casi negro con la
+                 bola empañada, crema con la bola limpia (y crema siempre fuera de la bola).
+                 Ver style.css y script.js (colorTitular).
+                 Cada palabra va en su .palabra para temblar por separado al agitar -->
+            <h1 class="titular">
+                <span class="l1"><span class="palabra">Cap</span> <span class="palabra">nen</span></span>
+                <span class="l2"><span class="palabra">Hi</span> <span class="palabra">juga</span></span>
+            </h1>
+
+            <!-- 20. Microtipografía y logotipos: el footer y los marcadores.
+                 Todo con pointer-events: none (style.css) -->
+            <div class="capa-micro">
+                <!-- Marcadores rojos -->
+                <span class="marcador marcador-arriba" aria-hidden="true"></span>
+                <span class="marcador marcador-abajo" aria-hidden="true"></span>
+
+                <!-- Abajo (footer): la entidad, la FECHA (obligatoria: es el único sitio del
+                     cartel donde aparece, y por eso va grande) y los logos -->
+                <p class="micro micro-entidad">Associació Educativa Itaca<br>L'Hospitalet de Llobregat<br>Campanya de Nadal 2026</p>
+                <p class="data">21 de desembre</p>
+
+                <!-- Itaca primero (la entidad de la campaña), PlanetaFP después (el centro que
+                     la firma). El filete separa dos marcas distintas -->
+                <div class="logos">
+                    <img class="logo-itaca" src="assets/logoItaca.png" alt="Logotip de l'Associació Educativa Itaca">
+                    <span class="logos-filet" aria-hidden="true"></span>
+                    <img class="logo-fp" src="assets/logoFP-negatiu.png" alt="Logotip de PlanetaFP">
+                </div>
+            </div>
+
+            <!-- 20–21. Texturas: assets/papel-pintado.webp y assets/ruido.webp (style.css) -->
+            <div class="papel" aria-hidden="true"></div>
+            <div class="grano" aria-hidden="true"></div>
+
+            <!-- 22. La viñeta general la pinta .escenario::before -->
+        </div>
+    </main>
+</body>
+</html>

@@ -1,0 +1,741 @@
+/* ==========================================================================
+   Cartel digital interactivo · Associació Educativa Itaca · v4
+   «Cap nen hi juga.»
+   Una sola luz, arriba a la izquierda. El calor solo existe dentro de la bola.
+   ========================================================================== */
+
+:root {
+    /* Fondo: verde abeto casi negro */
+    --muro-luz:      #24302A;
+    --muro:          #16201A;
+    --muro-sombra:   #111914;
+    --muro-profundo: #0B110D;
+    --vineta:        #050806;
+
+    /* Interior de la bola: los tonos de la foto del árbol (clave baja). Solo se
+       ven mientras la foto carga; después la escena lo cubre todo */
+    --interior-luz:   #3B3428;
+    --interior-medio: #241F18;
+    --interior-borde: #15120E;
+
+    /* Interior */
+    --abeto-oscuro:  #2E4034;
+    --abeto-medio:   #44604E;
+    --abeto-fondo:   #223027;
+    --crema:         #EDE4D4;
+    --nieve-suelo:   #CFD6CC;
+    --nieve-duna:    #DCE2D8;
+    --escarcha:      #DCE3E0;
+
+    /* Cálidos (solo dentro de la bola y en la luz que proyecta) */
+    --rojo:          #A8442F;
+    --rojo-claro:    #BC5038;
+    --dorado:        #C98F3C;
+    --dorado-claro:  #E0AC58;
+    --dorado-oscuro: #AE7A2E;
+    --madera:        #6B4F3A;
+
+    /* Estructura y texto */
+    --contorno:      #7D8C82;
+    /* Tipografía brutalista: dos tonos planos. Este rojo es más saturado que
+       --rojo a propósito */
+    --crema-titular: #E8DFCF;
+    --rojo-titular:  #C4382C;
+    --polvo:         #EEF3EC;
+
+    --fondo-pagina:  #0B100D;
+    --curva-juguete: cubic-bezier(.2, .8, .3, 1);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html,
+body {
+    height: 100%;
+}
+
+body {
+    background: var(--fondo-pagina);
+    overflow: hidden;
+    font-family: "Saira Condensed", "Arial Narrow", sans-serif;
+}
+
+/* Ocupa toda la ventana; el escenario se centra y escala desde JS */
+.marco {
+    position: fixed;
+    inset: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Lienzo 848 × 1200 con degradado direccional (la luz viene de arriba izq.)
+   -------------------------------------------------------------------------- */
+.escenario {
+    width: 848px;
+    height: 1200px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform-origin: top left;
+    overflow: hidden;
+    background:
+        radial-gradient(ellipse 120% 90% at 50% 45%,
+            transparent 48%, rgba(5, 8, 6, .55) 100%),
+        linear-gradient(145deg,
+            var(--muro-luz) 0%, var(--muro) 42%, var(--muro-sombra) 78%, var(--muro-profundo) 100%);
+    box-shadow: 0 24px 70px rgba(0, 0, 0, .6);
+}
+
+.capa {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 848px;
+    height: 1200px;
+    display: block;
+    pointer-events: none; /* las capas decorativas no deben robar eventos a .bola */
+}
+
+/* Orden de capas fuera de la bola */
+.neu-fons     { z-index: 0; }    /* nevada de fondo: sobre el muro, detrás de todo */
+.capa-fondo    { z-index: 1; }
+/* viñeta general: .escenario::before, z-index 2 (junto al polvo, por debajo de la bola) */
+.resplandor    { z-index: 3; }
+.capa-repisa   { z-index: 4; }
+#base-madera   { z-index: 5; }
+.bola          { z-index: 6; }
+.capa-borde    { z-index: 7; }
+.titular       { z-index: 20; }  /* por encima de la escarcha: se lee siempre */
+.capa-micro    { z-index: 20; }  /* microtipografía y logos */
+.papel         { z-index: 21; }
+.grano         { z-index: 22; }
+
+/* --------------------------------------------------------------------------
+   0. Nevada de fondo (script.js, pluja)
+   Copos que caen como lluvia sobre el muro, detrás de la bola. Es fondo: muy
+   tenue (la opacidad de cada copo la pone JS, entre 0,10 y 0,30) y la viñeta
+   general los apaga aún más en los bordes.
+   -------------------------------------------------------------------------- */
+.neu-fons {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 848px;
+    height: 1200px;
+    display: block;
+    pointer-events: none;
+}
+
+/* --------------------------------------------------------------------------
+   1–7. Haz de luz, repisa, polvo, resplandor, cáustica y sombras
+   -------------------------------------------------------------------------- */
+
+/* Barrido del haz: oscila ±3,5° alrededor de un pivote fuera del lienzo, donde
+   estaría la ventana. 22 s es deliberadamente lento: no se percibe como
+   animación, sino como que hay una ventana fuera de cuadro.
+   transform-box: fill-box es obligatorio: sin él, transform-origin se mide
+   desde el origen del SVG y no desde la caja del haz. La caja empieza en
+   (−130, −110), así que 160px −90px pone el pivote en (30, −200), sobre la
+   línea central del haz. script.js usa ese mismo pivote (PIVOTE_HAZ). */
+@keyframes barrido {
+    0%, 100% { transform: rotate(-3.5deg); }
+    50%      { transform: rotate(3.5deg); }
+}
+
+/* Sobre el fondo casi negro, el haz a plena intensidad competía con el titular:
+   ahora es un rastro de luz, lo justo para que el polvo tenga dónde encenderse */
+#haz-parallax { opacity: .35; }
+
+#haz-luz {
+    transform-box: fill-box;
+    transform-origin: 160px -90px;
+    animation: barrido 22s ease-in-out infinite;
+}
+
+/* Repisa: ya no es una línea, es un mueble. El canto claro de 9 px es el
+   filo recibiendo la luz, lo que la convierte en un volumen */
+.repisa-frente { fill: var(--muro-profundo); opacity: .7; }
+.repisa-canto  { fill: #3A4A40; opacity: .8; }
+.repisa-filo   { stroke: #56685C; stroke-width: 2; opacity: .6; }
+
+/* Opacidad y radio de cada mota: script.js, según lo dentro del haz que esté */
+.mota { fill: var(--polvo); }
+
+/* La bola es la única fuente de luz propia: JS sube su opacidad al limpiar */
+.resplandor {
+    position: absolute;
+    left: -121px;          /* 1090 × 1090 centrado en 424, 670 */
+    top: 125px;
+    width: 1090px;
+    height: 1090px;
+    background: radial-gradient(circle,
+        rgba(201, 143, 60, .42) 0%,
+        rgba(201, 143, 60, .16) 38%,
+        transparent 68%);
+    mix-blend-mode: screen;
+    opacity: .08;
+    pointer-events: none;
+    transition: opacity .9s ease-out;
+}
+
+/* Desplazada a la derecha: la luz llega desde la izquierda. Crece con el resplandor */
+.caustica {
+    fill: url(#grad-caustica);
+    opacity: .15;
+    transition: opacity .9s ease-out;
+}
+
+.sombra-larga {
+    fill: var(--abeto-oscuro);
+    opacity: .14;
+}
+
+.sombra-base {
+    fill: #1E2A22;
+    opacity: .34;
+}
+
+/* --------------------------------------------------------------------------
+   Slots de imagen (MidJourney). Mientras no hay PNG se ve el vector provisional
+   -------------------------------------------------------------------------- */
+.img-slot {
+    position: absolute;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+/* Modo depuración: añade class="ver-slots" al <body> para ver los marcos */
+.ver-slots .img-slot {
+    background-color: rgba(201, 143, 60, .25);
+    outline: 1px dashed #C98F3C;
+}
+
+.vector-provisional {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+/* Seis juguetes, grandes. Cada foto se encaja SIN deformar: el slot mide lo
+   que mide el contenido de la foto a esa escala, y se centra en su base.
+   El oso (132 % de la v4, 149 × 185) y el tren (120 %, 372 × 100) son los
+   más grandes: el tren cruza la bola por el centro para que se lea largo.
+   Pilota, robot e ioiò van al 100 % y la trompeta al 92 %.
+   Coordenadas de .bola (cartel − 39, − 285); el centro de la bola es (385, 385).
+   Dos bandas. Bases en el cartel (centro de cada juguete):
+     arriba → ós (377, 694) · trompeta (549, 698) · ioiò (689, 649)
+     abajo  → robot (275, 815) · tren (487, 807) · pilota (427, 915), delante
+   A este tamaño la bola está llena: los juguetes quedan muy juntos y se
+   rozan (hasta ~29 px de solape entre cajas en reposo; las fotos tienen las
+   esquinas transparentes, así que a la vista se pisan menos). Más grandes y
+   con aire entre ellos no caben, ni quitando uno: comprobado con un script.
+   Posiciones buscadas con ese script: ninguno se sale del cristal
+   (comprobadas las esquinas reales, ya giradas, durante la animación y con la
+   subida del hover; límite 340 px del centro), ninguno sube por encima de
+   y = 572 (la tinta de HI JUGA acaba en 565) y ninguno queda bajo el bloque
+   de texto izquierdo.
+   Las bases están en JOGUINES (script.js): si se mueve un slot, hay que
+   moverlo allí también, y su sombra de contacto en index.html. */
+#joguina-os       { left: 263.6px; top: 316.5px; width: 148.8px; height: 185.1px; }
+#joguina-trompeta { left: 403.3px; top: 336.4px; width: 213.5px; height: 153.2px; }
+#joguina-ioio     { left: 589px;   top: 303px;   width: 122px;   height: 122px;   }
+#joguina-robot    { left: 186.6px; top: 427px;   width: 98.9px;  height: 206px;   }
+#joguina-tren     { left: 262px;   top: 472.3px; width: 372px;   height: 99.5px;  }
+#joguina-pilota   { left: 301px;   top: 543.5px; width: 174px;   height: 173px;   }
+#base-madera      { left: 262px;   top: 1014px;  width: 324px;   height: 86px;    }
+
+/* Imágenes de MidJourney.
+   Todas traen margen transparente alrededor, así que no basta con
+   `contain`: background-size y background-position están calculados para que
+   el CONTENIDO (medido sobre el alfa, sin el margen) ocupe el slot exacto.
+   Si se cambia una imagen, hay que recalcularlos.
+   Imagen original → contenido (x, y, ancho, alto) → escala:
+     trompeta.webp     576 × 433 → 104, 116, 326 × 234 → 0,6548
+     robot.webp        433 × 576 → 121,  88, 204 × 425 → 0,4847
+     juguete-oso.webp  481 × 519 →  86,  72, 328 × 408 → 0,4538
+     pelota.webp       500 × 500 →  69,  93, 362 × 360 → 0,4807
+     tren.webp         792 × 315 →  98, 107, 598 × 160 → 0,6221
+   El ioiò no tiene foto: es un SVG dentro de su .joguina-hover (index.html).
+   La escena interior NO va aquí: la compone script.js en el canvas de la
+   escena para refractarla.
+   La imagen no la pinta el slot (.joguina, que lleva la animación) sino su
+   .joguina-hover interior, que lleva la subida del hover: por eso van como
+   variables (--img, --tam, --pos) que el div interior recoge. */
+#joguina-trompeta {
+    --img: url("assets/trompeta.webp");
+    --tam: 377.1px 283.5px;
+    --pos: -68.1px -76px;
+}
+
+#joguina-robot {
+    --img: url("assets/robot.webp");
+    --tam: 209.9px 279.2px;
+    --pos: -58.6px -42.7px;
+    transform-origin: 50% 100%;   /* bascula sobre los pies al dar cada paso */
+}
+
+#joguina-os {
+    --img: url("assets/juguete-oso.webp");
+    --tam: 218.3px 235.5px;
+    --pos: -39px -32.7px;
+}
+
+#joguina-pilota {
+    --img: url("assets/pelota.webp");
+    --tam: 240.3px 240.3px;
+    --pos: -33.2px -44.7px;
+}
+
+#joguina-tren {
+    --img: url("assets/tren.webp");
+    --tam: 492.7px 196px;
+    --pos: -61px -66.6px;
+}
+
+#joguina-ioio svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+#base-madera {
+    background-image: url("assets/base-madera.webp");      /* contenido 324 × 79, apoyado en la repisa */
+    background-size: 471.8px 125.9px;
+    background-position: -70.8px -29.6px;
+}
+
+/* Con imagen, el vector provisional se oculta */
+#base-madera > .vector-provisional { display: none; }
+
+/* Oclusión en la unión de la base con el cristal, por encima de la imagen */
+.oclusion-base {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* Base */
+.madera     { fill: var(--madera); }
+.labio      { fill: #7E5F47; }
+.zocalo     { fill: #55402F; }
+.labio-luz  { fill: #8E6D52; opacity: .7; }
+.oclusion   { fill: #241A13; opacity: .5; }
+
+/* --------------------------------------------------------------------------
+   6–18. La bola
+   -------------------------------------------------------------------------- */
+.bola {
+    position: absolute;
+    left: 39px;
+    top: 285px;
+    width: 770px;
+    height: 770px;
+    border-radius: 50%;
+    overflow: hidden;
+    clip-path: circle(385px at 50% 50%); /* recorta también la zona que recibe el ratón */
+    isolation: isolate;
+}
+
+/* Todo lo de dentro ignora el ratón: los eventos los recibe siempre .bola */
+.bola * {
+    pointer-events: none;
+}
+
+/* La bola se inclina hasta 3° hacia el cursor (transform desde script.js).
+   La perspectiva va dentro del propio transform: `perspective` en .escenario
+   no llegaría hasta aquí, porque solo afecta a los hijos directos.
+   Sin transición: el cursor que la mueve ya llega suavizado.
+   Más de 3° y el círculo empieza a verse como elipse. */
+.bola-inclinable {
+    position: absolute;
+    inset: 0;
+    will-change: transform;
+    /* Cristal: el interior se ilumina desde arriba a la izquierda, no se rellena plano.
+       Si se cambia, hay que cambiar también pintarFondoCristal() en script.js */
+    background: radial-gradient(616px circle at 34% 27%,
+        var(--interior-luz) 0%, var(--interior-medio) 52%, var(--interior-borde) 100%);
+}
+
+.bola-inclinable > canvas,
+.capa-bola {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 770px;
+    height: 770px;
+    display: block;
+}
+
+/* Escena refractada: 1040 × 1040 centrada en la bola (sobresale 135 px por lado) */
+#escena-interior {
+    position: absolute;
+    inset: 0;
+}
+
+#escena-vector,
+#escena-refractada {
+    position: absolute;
+    left: -135px;
+    top: -135px;
+    width: 1040px;
+    height: 1040px;
+}
+
+/* Hasta que la versión refractada está lista se ve el SVG sin deformar */
+#escena-refractada                      { display: none; }
+.refractada #escena-refractada          { display: block; }
+.refractada #escena-vector              { display: none; }
+
+/* Orden dentro de la bola (sección C) */
+#escena-interior  { z-index: 1; }
+#nieve-fondo      { z-index: 2; }
+.sombras-contacto { z-index: 3; }
+.cordill          { z-index: 3; }
+.joguina          { z-index: 4; }
+#nieve-media      { z-index: 5; }
+.sombra-interior  { z-index: 6; }
+#nieve-cerca      { z-index: 7; }
+.cristal          { z-index: 8; }
+#humedad          { z-index: 10; }
+#escarcha         { z-index: 11; }
+
+/* Dos transformaciones anidadas:
+   · .joguina (el slot): la animación (deriva, rodar, andar, el ioiò…), desde
+     script.js en cada fotograma. SIN transición: el movimiento ya es continuo
+     y una transición encima lo retrasaría y lo haría pastoso. El robot, además,
+     salta de posición a propósito: con transición dejaría de ser un robot.
+   · .joguina-hover (dentro): la reacción al hover, un cambio discreto, con su
+     transición de 220 ms. script.js solo pone o quita la clase .activo. */
+.joguina {
+    will-change: transform;
+    transform-origin: 50% 50%;
+}
+
+.joguina-hover {
+    position: absolute;
+    inset: 0;
+    background-image: var(--img);
+    background-size: var(--tam, contain);
+    background-position: var(--pos, center);
+    background-repeat: no-repeat;
+    transition: transform .22s var(--curva-juguete);
+}
+
+/* Al pasar sobre un juguete destapado: sube 14 px y gira 2°
+   (ELEVACION_HOVER en script.js tiene que coincidir: la usa la sombra) */
+.joguina.activo > .joguina-hover {
+    transform: translateY(-14px) rotate(2deg);
+}
+
+/* Cogido con el ratón (script.js, coger): por encima de los demás juguetes, un
+   poco más grande y con una sombra que lo separa de la escena, como algo que se
+   levanta de verdad. Sin rotate: la inclinación la pone JS según la velocidad */
+.joguina.cogida {
+    z-index: 5;
+}
+
+.joguina.cogida > .joguina-hover {
+    transform: translateY(-14px) scale(1.07);
+    filter: drop-shadow(0 16px 12px rgba(10, 8, 6, .45));
+}
+
+/* Cordel del ioiò: fino y claro, como un hilo de algodón a contraluz */
+.cordill line {
+    stroke: #E8DFCF;
+    stroke-width: 1.4;
+    stroke-linecap: round;
+    opacity: .7;
+}
+
+/* Opacidad y escala desde script.js: crecen y se difuminan cuando el juguete sube.
+   Casi negra y cálida: cae sobre la nieve de la foto, que está en sombra */
+.sombra-contacto {
+    fill: #120F0B;
+    opacity: .4;
+    transform-box: fill-box;
+    transform-origin: center;
+}
+
+/* Profundidad de campo: la nieve pegada al cristal está desenfocada */
+#nieve-cerca {
+    filter: blur(2.6px);
+}
+
+#escarcha {
+    border-radius: 50%;
+    opacity: .93; /* deja intuir la escena; JS lo baja al 89 % al entrar */
+    transition: opacity .4s ease;
+}
+
+/* Cristal */
+.anillo-cristal {
+    fill: none;
+    stroke: url(#grad-anillo);
+    stroke-width: 34;
+}
+
+.luna-luz {
+    fill: #EDF2EC;
+    opacity: .26;
+}
+
+.luna-rebote {
+    fill: #CFE0D2;
+    opacity: .13;
+}
+
+.brillo-suave      { fill: url(#grad-brillo-suave); }
+.especular-grande  { fill: #FFFFFF; opacity: .4; }
+.especular-pequeno { fill: #FFFFFF; opacity: .55; }
+
+.borde-cristal {
+    fill: none;
+    stroke: #6E7E74;
+    stroke-width: 2;
+    opacity: .8;
+}
+
+/* --------------------------------------------------------------------------
+   19. Titular brutalista
+   Anton, un solo peso. Gana por ser estrecha: a igual ancho de línea cabe
+   mucho más alta, y eso es lo que da el aspecto brutalista. Tiene Ú, À, È,
+   É, Í, Ò, Ó y Ç: el catalán no obliga a sustituir la fuente.
+   «CAP NEN» es la línea ancha y ocupa con su TINTA los 720 px de la zona
+   segura (64 → 784). Medido en el navegador con measureText: a 248 px (lo
+   que proponía el documento) la tinta mide 702 px, porque el tracking de
+   −0,03 em también se come ancho; hacen falta 254,3 px para llegar a 720.
+   La tinta de la C empieza 7,2 px a la derecha del origen del texto: por eso
+   left es 56,8 y no 64, para que la tinta quede alineada con el margen.
+   «HI JUGA» queda en bandera.
+   · Letras más largas: scaleY(1.1) sobre todo el bloque, desde arriba. Estira
+     las letras un 10 % sin cambiar el ancho (los 720 px se mantienen). Para
+     que el bloque no crezca de más, la interlínea baja a 1,0: el hueco entre
+     las dos líneas queda en 37 px.
+   Con top 24,4, las mayúsculas de CAP NEN van de y = 40 a 282 y las de
+   HI JUGA, de y = 320 a 565: cruzan la parte alta de la bola (desde
+   y = 285). La trompeta, en el peor momento de su ciclo, sube hasta
+   y = 578: no toca el titular.
+   · Dos tonos planos, sin modos de fusión: difference embarraba el titular.
+   · letter-spacing en em, no en px: así escala con el cuerpo.
+   · pointer-events: none es imprescindible: la caja del titular es rectangular,
+     invade la bola y, sin esto, la escarcha dejaría de limpiarse ahí sin dar
+     ningún error.
+   -------------------------------------------------------------------------- */
+.titular {
+    position: absolute;
+    left: 56.8px;
+    top: 24.4px;
+    margin: 0;
+    font-family: "Anton", "Arial Narrow", sans-serif;
+    font-weight: 400;              /* Anton solo tiene un peso */
+    font-size: 254.3px;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    pointer-events: none;
+    transform: scaleY(1.1);        /* script.js lo lee de aquí: no hace falta tocarlo allí */
+    transform-origin: 0 0;
+    /* El color de HI JUGA dentro de la bola llega desde script.js cinco veces
+       por segundo; la transición lo funde entre medida y medida */
+    transition: --color-escarcha .3s linear;
+}
+
+/* El color de HI JUGA dentro de la bola. Registrado como <color> para que se
+   pueda animar con transition (una variable sin registrar salta de golpe) */
+@property --color-escarcha {
+    syntax: "<color>";
+    inherits: true;
+    initial-value: #16201A;
+}
+
+/* CAP NEN: rojo, sobre el fondo oscuro. Ahí se lee bien siempre */
+.titular .l1 { display: block; color: var(--rojo-titular); }
+.titular .l2 { display: block; }
+
+/* HI JUGA: el color va ligado a la escarcha.
+   Medido sobre la build, la escarcha es #C6C9BE y el árbol destapado
+   #664435. El crema da 1,27:1 sobre la escarcha (invisible) y 6,50:1 sobre
+   el árbol: ningún color plano aguanta los dos. Así que el color se mueve
+   con el porcentaje de escarcha (script.js, colorTitular):
+     bola empañada → verde casi negro #16201A (9,95:1 sobre la escarcha)
+     bola limpia   → crema #E8DFCF (6,50:1 sobre el árbol)
+   Pero HI JUGA no cae entero sobre la bola: la parte alta de la H y de la I
+   va sobre el muro, que es #16201A. Ahí el verde desaparecería. Por eso el
+   color es un degradado radial con la forma de la bola, recortado a la
+   letra (background-clip: text): dentro del cristal, el color de la
+   escarcha; fuera, crema siempre. script.js calcula dónde cae el centro de
+   la bola respecto a cada palabra (--bola-x, --bola-y) y el radio, que en
+   vertical se divide por el scaleY del titular. Hasta que lo calcula, el
+   centro está lejísimos y todo sale en crema */
+.titular .l2 .palabra {
+    color: transparent;
+    background-image: radial-gradient(
+        ellipse var(--bola-rx, 385px) var(--bola-ry, 350px) at var(--bola-x, -9999px) var(--bola-y, -9999px),
+        var(--color-escarcha) calc(100% - .5px),
+        var(--crema-titular) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+}
+
+/* Cada palabra tiembla por separado al agitar (script.js).
+   inline-block es imprescindible: transform no se aplica a elementos en línea */
+.titular .palabra {
+    display: inline-block;
+    transition: transform .12s linear;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #haz-luz { animation: none; }
+    .titular .palabra { transform: none !important; }
+}
+
+/* --------------------------------------------------------------------------
+   20. Microtipografía: el footer (entidad, fecha y logotipos) y los
+   marcadores. Saira Condensed, mayúsculas, 13 px. Coordenadas del cartel;
+   "top" es el borde superior de la caja de texto.
+   pointer-events: none en toda la capa.
+   -------------------------------------------------------------------------- */
+.capa-micro {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.capa-micro p {
+    margin: 0;
+}
+
+.micro {
+    position: absolute;
+    font-family: "Saira Condensed", "Arial Narrow", sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    line-height: 1.4;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    pointer-events: none;
+}
+
+/* Footer, sobre el frente de la repisa: la entidad, la fecha y los logos.
+   Empieza en y = 1114: más arriba lo cruzaría el filo de la repisa, que está
+   en y = 1100 porque ahí se apoya la base de la bola */
+.micro-entidad {
+    left: 64px;
+    top: 1114px;
+    font-size: 13px;
+    color: var(--crema-titular);
+}
+
+/* La fecha es obligatoria y solo aparece aquí: va en Anton y en el rojo del
+   titular, para que se vea, pero a 44 px, sin competir con él. Sus mayúsculas
+   (y = 1114 a 1152) quedan a la altura del bloque de la entidad, y en
+   horizontal está centrada entre la entidad (acaba en x = 207) y los logos
+   (empiezan en x = 622) */
+.data {
+    position: absolute;
+    left: 281px;
+    top: 1112px;
+    margin: 0;
+    font-family: "Anton", "Arial Narrow", sans-serif;
+    font-size: 44px;
+    line-height: 1;
+    letter-spacing: 0;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: var(--rojo-titular);
+    pointer-events: none;
+}
+
+/* Logotipos, abajo a la derecha: Itaca primero, PlanetaFP después.
+   La bola acaba en y = 1055: desde 1080 no se apoyan en el cristal.
+   El ALTO manda, nunca el ancho: fijando el alto, las dos marcas pesan
+   parecido. Igualar el alto no basta, porque Itaca es un bloque vertical y
+   compacto y PlanetaFP un logotipo ancho: a 34 px los dos, PlanetaFP se
+   imponía y el texto pequeño de Itaca («associació educativa») no se leía.
+   Ajustado a ojo hasta que pesan igual.
+   · Colores oficiales, sin filtros. Itaca llega en su versión monocroma
+     blanca. PlanetaFP se usa en negativo (logoFP-negatiu.png: «Planeta» en
+     blanco y «FP» en su rojo exacto), porque el original lleva «Planeta» en
+     negro y sobre este fondo casi negro desaparecía.
+   · El filete de 1 px separa dos marcas distintas, con 18 px de aire. */
+.logos {
+    position: absolute;
+    right: 64px;
+    top: 1080px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    pointer-events: none;
+}
+
+.logos img {
+    display: block;
+    width: auto;
+}
+
+.logo-itaca { height: 56px; }
+.logo-fp    { height: 24px; }
+
+.logos-filet {
+    width: 1px;
+    height: 24px;
+    background: #3A4A40;
+}
+
+/* 4.5 Marcadores: rematan el lenguaje brutalista */
+.marcador {
+    position: absolute;
+    left: 64px;
+    width: 9px;
+    height: 9px;
+    background: var(--rojo-titular);
+}
+
+.marcador-arriba { top: 22px; }
+.marcador-abajo  { top: 1086px; }
+
+/* --------------------------------------------------------------------------
+   21–22. Texturas · viñeta general
+   Van por encima de TODO el texto, para que el grano caiga también sobre la
+   tipografía: es lo que une la pieza.
+   pointer-events: none NO es opcional: sin él se comen todos los eventos.
+   En brutalismo el grano no es un acabado sutil, es parte del lenguaje.
+   Si los textos de 11 px se ensucian, bajar el grano a 0.11, nunca por debajo
+   de 0.09. Hay un assets/ruido-grueso.webp de reserva.
+   -------------------------------------------------------------------------- */
+.papel,
+.grano {
+    position: absolute;
+    inset: 0;
+    background-size: 512px;
+    pointer-events: none;
+}
+
+.papel {
+    background-image: url("assets/papel-pintado.webp");
+    mix-blend-mode: multiply;
+    opacity: .22;
+}
+
+.grano {
+    background-image: url("assets/ruido.webp");
+    mix-blend-mode: overlay;
+    opacity: .14;
+}
+
+.escenario::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    background: radial-gradient(ellipse 115% 85% at 42% 40%,
+        transparent 50%, rgba(5, 8, 6, .6) 100%);
+    pointer-events: none;
+}
