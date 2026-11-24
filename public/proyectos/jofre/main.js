@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
 
 /* ==========================================================================
    CONFIGURACIÓN
@@ -895,7 +896,8 @@ function loadModels() {
   manager.onProgress = (url, loaded, total) => {
     loaderText.textContent = `Preparando la Navidad… ${Math.round((loaded / total) * 100)}%`;
   };
-  const gltfLoader = new GLTFLoader(manager);
+  // Los modelos van comprimidos con meshopt (EXT_meshopt_compression)
+  const gltfLoader = new GLTFLoader(manager).setMeshoptDecoder(MeshoptDecoder);
 
   const names = Object.keys(FILES);
   const requests = names.map((name) => gltfLoader.loadAsync(FILES[name]));
