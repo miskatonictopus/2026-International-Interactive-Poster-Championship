@@ -18,4 +18,5 @@ export const posters = [
   { id: "jofre", author: "Jofre", course: "DAW 2" },
   { id: "vito", author: "Vito", course: "DAW 2" },
   { id: "eduardo", author: "Eduardo", course: "DAW 2" },
+  { id: "patrick", author: "Patrick", course: "DAW 2" },
 ]

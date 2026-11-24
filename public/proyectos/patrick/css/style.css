@@ -1,0 +1,128 @@
+@font-face {
+  font-family: "Inter";
+  src: url("../assets/fonts/InterVariable.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+}
+
+:root {
+  color-scheme: dark;
+  font-family: "Trebuchet MS", Arial, sans-serif;
+  background: #080c10;
+  color: #fff8ec;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  min-height: 100vh;
+  min-height: 100svh;
+  margin: 0;
+  padding: 16px;
+  display: grid;
+  place-items: center;
+}
+
+/* Formato original: 848 × 1200 px. Se reduce según ambos ejes. */
+.poster {
+  box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+  width: min(848px, 100%, calc((100svh - 32px) * 848 / 1200));
+  aspect-ratio: 848 / 1200;
+  container-type: inline-size;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(to bottom, #A3A3A3, hsl(0 0% 3.9%));
+  border-radius: 12px;
+  isolation: isolate;
+}
+
+.poster__header {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.poster__logos {
+  display: flex;
+  align-items: center;
+  gap: calc(20 / 848 * 100cqw);
+}
+
+.poster__logo {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: calc(180 / 848 * 100cqw);
+  max-height: calc(88 / 848 * 100cqw);
+  object-fit: contain;
+  padding: 5px;
+}
+
+.poster__date {
+  margin: 0;
+  color: #2F2F2F;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: calc(32 / 848 * 100cqw);
+  font-style: italic;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.poster__title {
+  position: absolute;
+  inset: 0 0 auto;
+  width: 100%;
+  height: calc(400 / 848 * 100cqw);
+  margin: 15px 0 0;
+  z-index: 1;
+  display: block;
+  font-family: "Inter", Arial, sans-serif;
+  font-size: calc((100cqw - 30px) / 5.115);
+  font-weight: 800;
+  font-style: normal;
+  font-synthesis: none;
+  font-optical-sizing: auto;
+  line-height: 0.9em;
+  letter-spacing: -0.05em;
+  text-align: left;
+  padding-inline: 15px;
+  color: #FFFFFF;
+  text-shadow:
+    0 1px 0 #d9d9d9,
+    0 2px 0 #bdbdbd,
+    0 3px 0 #999999,
+    0 4px 0 #747474,
+    0 6px 8px #00000040,
+    0 12px 20px #00000033;
+}
+
+.poster__canvas {
+  position: absolute;
+  inset: 0 0 10%;
+  width: 100%;
+  height: 90%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.poster__footer {
+  position: absolute;
+  inset: auto 0 0;
+  height: 10%; /* y=1080–1200 en el formato original. */
+  z-index: 2;
+  background: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(20 / 848 * 100cqw);
+  padding: calc(16 / 848 * 100cqw) calc(24 / 848 * 100cqw);
+}
+
+
+
