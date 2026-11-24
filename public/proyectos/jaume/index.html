@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>21 de diciembre · Ningún niño sin regalo · Fundación ITACA</title>
+  <!-- favicon en línea: evita el error 404 de /favicon.ico en la consola -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-50 -50 100 100'%3E%3Cpath d='M0-48 L7-7 L48 0 L7 7 L0 48 L-7 7 L-48 0 L-7-7Z' fill='%23f6c453'/%3E%3C/svg%3E">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,700;0,9..144,900;1,9..144,400;1,9..144,700&family=DM+Sans:wght@400;500;700&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="stage">
+    <article class="poster" id="poster" aria-label="Cartel: 21 de diciembre, ningún niño sin regalo. Fundación ITACA">
+
+      <!-- ===== Capas de fondo ===== -->
+      <div class="poster__bg" aria-hidden="true"></div>
+      <div class="stars stars--far" id="starsFar" aria-hidden="true"></div>
+      <div class="stars stars--near" id="starsNear" aria-hidden="true"></div>
+      <div class="cursor-glow" id="glow" aria-hidden="true"></div>
+
+      <!-- ===== Cabecera ===== -->
+      <header class="top">
+        <span class="top__brand">Fundación ITACA</span>
+        <span class="top__meta">L'Hospitalet · Navidad 2026</span>
+      </header>
+
+      <!-- ===== Fecha (profundidad con mousemove) ===== -->
+      <section class="date" id="date">
+        <div class="date__num">
+          <span class="date__echo" id="dateEcho" aria-hidden="true">21</span>
+          <span class="date__main">21</span>
+        </div>
+        <div class="date__side">
+          <svg class="star" id="star" viewBox="-50 -50 100 100" aria-hidden="true">
+            <path d="M0-48 L7-7 L48 0 L7 7 L0 48 L-7 7 L-48 0 L-7-7Z" fill="#f6c453"/>
+            <path d="M0-26 L4-4 L26 0 L4 4 L0 26 L-4 4 L-26 0 L-4-4Z" transform="rotate(45)" fill="#fff3df" opacity=".85"/>
+          </svg>
+          <p class="date__month">de<br>diciembre</p>
+          <p class="date__tag">Campaña de regalos solidarios</p>
+        </div>
+      </section>
+
+      <!-- ===== Titular (letras reaccionan al cursor) ===== -->
+      <h1 class="headline" id="headline" aria-label="Ningún niño sin regalo.">
+        <span class="headline__line" data-base="#fff3df" data-hover="#f6c453">Ningún niño</span>
+        <span class="headline__line headline__line--accent" data-base="#ff7a66" data-hover="#fff3df">sin regalo.</span>
+      </h1>
+
+      <!-- ===== Regalos (mouseenter / mouseleave) ===== -->
+      <section class="gifts" id="gifts" aria-label="Regalos: pasa el cursor para descubrir qué piden">
+        <div class="gift" tabindex="0" data-tilt="-4" style="--w:108px; --h:128px; --c:#e0483e; --r:#f6c453; --rot:-4deg;">
+          <span class="gift__wish">Un cuento</span>
+          <span class="gift__glow"></span>
+          <span class="gift__lid"><span class="gift__bow"></span></span>
+          <span class="gift__box"></span>
+        </div>
+        <div class="gift" tabindex="0" data-tilt="3" style="--w:136px; --h:160px; --c:#2f9e78; --r:#fff3df; --rot:3deg; --pat: repeating-linear-gradient(45deg, transparent 0 12px, rgba(255,255,255,.12) 12px 24px);">
+          <span class="gift__wish">Una bici</span>
+          <span class="gift__glow"></span>
+          <span class="gift__lid"><span class="gift__bow"></span></span>
+          <span class="gift__box"></span>
+        </div>
+        <div class="gift" tabindex="0" data-tilt="-3" style="--w:94px; --h:108px; --c:#f6c453; --r:#e0483e; --rot:-2deg;">
+          <span class="gift__wish">Un puzle</span>
+          <span class="gift__glow"></span>
+          <span class="gift__lid"><span class="gift__bow"></span></span>
+          <span class="gift__box"></span>
+        </div>
+        <div class="gift" tabindex="0" data-tilt="4" style="--w:126px; --h:146px; --c:#5ab0e8; --r:#fff3df; --rot:4deg; --pat: radial-gradient(circle, rgba(255,255,255,.28) 3px, transparent 4px) 0 0 / 18px 18px;">
+          <span class="gift__wish">Unos patines</span>
+          <span class="gift__glow"></span>
+          <span class="gift__lid"><span class="gift__bow"></span></span>
+          <span class="gift__box"></span>
+        </div>
+        <div class="gift" tabindex="0" data-tilt="-3" style="--w:100px; --h:118px; --c:#f08bb0; --r:#2f9e78; --rot:-3deg;">
+          <span class="gift__wish">Una muñeca</span>
+          <span class="gift__glow"></span>
+          <span class="gift__lid"><span class="gift__bow"></span></span>
+          <span class="gift__box"></span>
+        </div>
+        <div class="gift" tabindex="0" data-tilt="3" style="--w:116px; --h:150px; --c:#7a5cc9; --r:#f6c453; --rot:2deg; --pat: repeating-linear-gradient(0deg, transparent 0 14px, rgba(255,255,255,.1) 14px 18px);">
+          <span class="gift__wish">Una pelota</span>
+          <span class="gift__glow"></span>
+          <span class="gift__lid"><span class="gift__bow"></span></span>
+          <span class="gift__box"></span>
+        </div>
+        <div class="shelf" aria-hidden="true"></div>
+      </section>
+
+      <!-- ===== Mensaje ===== -->
+      <section class="message">
+        <p class="message__text">
+          Este <strong>21 de diciembre</strong>, tu aportación se convierte en regalos de Navidad
+          para niños y niñas en riesgo de exclusión social. Un pequeño gesto, una gran ilusión.
+        </p>
+
+        <div class="cta-row">
+          <!-- Llamada a la acción "magnética" (mouseenter / mousemove / mouseleave) -->
+          <div class="cta" id="cta">
+            <span class="cta__pill"><span class="cta__label" id="ctaLabel">Dona desde 5&nbsp;€</span></span>
+          </div>
+
+          <!-- Progreso: un indicador por regalo (se generan desde JS) -->
+          <div class="progress">
+            <div class="progress__dots" id="progressDots" aria-hidden="true"></div>
+            <p class="progress__label" id="progressLabel" aria-live="polite">Pasa el cursor por los regalos y descubre qué piden</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== Branding ===== -->
+      <footer class="brands">
+        <div class="brands__org">
+          <img class="brands__logo" src="Images/logo_Itaca.webp" alt="Logo de ITACA, associació educativa">
+          <div>
+            <span class="brands__label">Organiza</span>
+            <strong class="brands__name">Fundación ITACA</strong>
+            <span class="brands__place">L'Hospitalet de Llobregat</span>
+          </div>
+        </div>
+
+        <div class="brands__info">
+          <strong>#NingúnNiñoSinRegalo</strong>
+          <span>Donativos en la recepción del centro</span>
+        </div>
+
+        <svg class="seal" id="seal" viewBox="0 0 100 100" aria-label="Sello Navidad Solidaria 2026">
+          <defs>
+            <path id="sealPath" d="M50,50 m-38,0 a38,38 0 1,1 76,0 a38,38 0 1,1 -76,0"/>
+          </defs>
+          <circle cx="50" cy="50" r="48" fill="none" stroke="currentColor" stroke-width="1.2"/>
+          <circle cx="50" cy="50" r="28" fill="none" stroke="currentColor" stroke-width=".8" opacity=".5"/>
+          <text class="seal__ring"><textPath href="#sealPath" textLength="234">NAVIDAD SOLIDARIA · ITACA · 2026 ·</textPath></text>
+          <text class="seal__center" x="50" y="57" text-anchor="middle">21·XII</text>
+        </svg>
+      </footer>
+
+      <!-- ===== Nieve (canvas, reacciona al cursor) ===== -->
+      <canvas class="snow" id="snow" aria-hidden="true"></canvas>
+    </article>
+  </main>
+
+  <script src="main.js"></script>
+</body>
+</html>
