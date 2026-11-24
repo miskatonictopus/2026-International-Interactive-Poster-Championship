@@ -1,10 +1,21 @@
-import { get } from "@vercel/blob"
 import { randomUUID } from "node:crypto"
 import { mkdir, readFile, rename, rm, writeFile } from "node:fs/promises"
 import { dirname, join } from "node:path"
 
+import { SupabaseError, supabase, supabaseFetch } from "@/lib/supabase"
+
 export type Votes = Record<string, Record<string, number>>
 export type Totals = { total: number; points: number }
+
+/** Carteles distintos que puede puntuar cada persona. */
+export const MAX_VOTES = 3
+
+/** Se lanza al intentar puntuar un cartel nuevo con el cupo ya agotado. */
+export class VoteLimitError extends Error {
+  constructor() {
+    super(`Solo se pueden votar ${MAX_VOTES} carteles`)
+  }
+}
 
 const voteFile =
   process.env.VOTES_FILE ?? join(process.cwd(), ".data", "votes.json")
@@ -22,46 +33,14 @@ export function votingIsOpen() {
 
 /* ---------- Supabase (producción) ---------- */
 
-function supabase() {
-  const url = process.env.SUPABASE_URL
-  const key = process.env.SUPABASE_SECRET_KEY
-  if (url && key) return { url: url.replace(/\/$/, ""), key }
-  if (process.env.VERCEL === "1") {
-    throw new Error(
-      "Configura SUPABASE_URL y SUPABASE_SECRET_KEY para guardar los votos"
-    )
-  }
-  return null
-}
+type Db = NonNullable<ReturnType<typeof supabase>>
 
-async function rest(
-  { url, key }: { url: string; key: string },
-  path: string,
-  init: RequestInit = {}
-) {
-  const headers = new Headers(init.headers)
-  headers.set("apikey", key)
-  // Las claves antiguas (service_role) son JWT y van también como Bearer.
-  if (!key.startsWith("sb_")) headers.set("Authorization", `Bearer ${key}`)
-  if (init.body) headers.set("Content-Type", "application/json")
-
-  const response = await fetch(`${url}/rest/v1/${path}`, {
-    ...init,
-    headers,
-    cache: "no-store",
-    signal: AbortSignal.timeout(8000),
-  })
-  if (!response.ok) {
-    throw new Error(
-      `Supabase respondió ${response.status}: ${await response.text()}`
-    )
-  }
-  return response
-}
-
-async function supabaseTotals(db: { url: string; key: string }) {
+async function supabaseTotals(db: Db) {
   const rows: { poster: string; total: number; points: number }[] = await (
-    await rest(db, "rpc/vote_totals", { method: "POST", body: "{}" })
+    await supabaseFetch(db, "rest/v1/rpc/vote_totals", {
+      method: "POST",
+      body: "{}",
+    })
   ).json()
   return Object.fromEntries(
     rows.map(({ poster, total, points }) => [
@@ -71,23 +50,14 @@ async function supabaseTotals(db: { url: string; key: string }) {
   )
 }
 
-/** Inserta votos; con `keepExisting` no sobrescribe los que ya existan. */
-export async function upsertVotes(
-  rows: { poster: string; voter: string; rating: number }[],
-  { keepExisting = false } = {}
-) {
-  const db = supabase()
-  if (!db) throw new Error("Supabase no está configurado")
-  if (rows.length === 0) return
-  await rest(db, "votes?on_conflict=poster,voter", {
-    method: "POST",
-    headers: {
-      Prefer: `resolution=${keepExisting ? "ignore" : "merge"}-duplicates,return=minimal`,
-    },
-    body: JSON.stringify(
-      rows.map((row) => ({ ...row, updated_at: new Date().toISOString() }))
-    ),
-  })
+async function supabaseVoterVotes(db: Db, voter: string) {
+  const rows: { poster: string; rating: number }[] = await (
+    await supabaseFetch(
+      db,
+      `rest/v1/votes?select=poster,rating&voter=eq.${encodeURIComponent(voter)}`
+    )
+  ).json()
+  return Object.fromEntries(rows.map(({ poster, rating }) => [poster, rating]))
 }
 
 /* ---------- Archivo local (desarrollo sin Supabase) ---------- */
@@ -111,6 +81,14 @@ function localTotals(votes: Votes, poster: string): Totals {
   }
 }
 
+function localVoterVotes(votes: Votes, voter: string) {
+  return Object.fromEntries(
+    Object.entries(votes).flatMap(([poster, voters]) =>
+      voter in voters ? [[poster, voters[voter]]] : []
+    )
+  )
+}
+
 /* ---------- API común ---------- */
 
 /** Totales de todos los pósters que tienen votos. */
@@ -123,38 +101,73 @@ export async function readTotals(): Promise<Record<string, Totals>> {
   )
 }
 
-/** Totales de un póster y el voto de este votante. */
-export async function readSummary(poster: string, voter: string) {
+/** Notas que ha puesto un votante, por póster. */
+export async function readVoterVotes(
+  voter: string
+): Promise<Record<string, number>> {
+  const db = supabase()
+  if (db) return supabaseVoterVotes(db, voter)
+  return localVoterVotes(await readLocalVotes(), voter)
+}
+
+/** Totales de un póster y, si hay votante, su nota. */
+export async function readSummary(poster: string, voter: string | null) {
   const db = supabase()
   if (!db) {
     const votes = await readLocalVotes()
     return {
       ...localTotals(votes, poster),
-      rating: votes[poster]?.[voter] ?? null,
+      rating: (voter && votes[poster]?.[voter]) || null,
     }
   }
 
   const [totals, mine] = await Promise.all([
     supabaseTotals(db),
-    rest(
-      db,
-      `votes?select=rating&poster=eq.${encodeURIComponent(poster)}&voter=eq.${encodeURIComponent(voter)}`
-    ).then((response) => response.json() as Promise<{ rating: number }[]>),
+    voter ? supabaseVoterVotes(db, voter) : {},
   ])
   return {
     ...(totals[poster] ?? { total: 0, points: 0 }),
-    rating: mine[0]?.rating ?? null,
+    rating: (mine as Record<string, number>)[poster] ?? null,
   }
 }
 
+/**
+ * Guarda o cambia la nota de un votante. Se puede cambiar la nota de un póster
+ * ya votado, pero no votar más de MAX_VOTES pósters distintos: en Supabase lo
+ * impide el trigger `votes_limit` (a prueba de peticiones simultáneas).
+ */
 export async function saveVote(poster: string, voter: string, rating: number) {
-  if (supabase()) {
-    await upsertVotes([{ poster, voter, rating }])
+  const db = supabase()
+  if (db) {
+    try {
+      await supabaseFetch(db, "rest/v1/votes?on_conflict=poster,voter", {
+        method: "POST",
+        headers: { Prefer: "resolution=merge-duplicates,return=minimal" },
+        body: JSON.stringify({
+          poster,
+          voter,
+          rating,
+          updated_at: new Date().toISOString(),
+        }),
+      })
+    } catch (error) {
+      if (
+        error instanceof SupabaseError &&
+        error.body.includes("vote_limit_reached")
+      ) {
+        throw new VoteLimitError()
+      }
+      throw error
+    }
     return readSummary(poster, voter)
   }
 
   const write = localWrites.then(async () => {
     const votes = await readLocalVotes()
+    const mine = localVoterVotes(votes, voter)
+    if (!(poster in mine) && Object.keys(mine).length >= MAX_VOTES) {
+      throw new VoteLimitError()
+    }
     votes[poster] ??= {}
     votes[poster][voter] = rating
 
@@ -175,20 +188,4 @@ export async function saveVote(poster: string, voter: string, rating: number) {
   )
   await write
   return readSummary(poster, voter)
-}
-
-/* ---------- Migración desde Vercel Blob ---------- */
-
-/** Lee los votos antiguos guardados en Vercel Blob (solo para migrarlos). */
-export async function readLegacyBlobVotes(): Promise<Votes> {
-  const result = await get("itaca/votes.json", {
-    access: "private",
-    useCache: false,
-    abortSignal: AbortSignal.timeout(8000),
-  })
-  if (!result) return {}
-  if (result.statusCode !== 200) {
-    throw new Error("No se pudieron leer los votos de Vercel Blob")
-  }
-  return new Response(result.stream).json()
 }

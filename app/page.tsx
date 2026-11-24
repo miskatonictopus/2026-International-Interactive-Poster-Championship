@@ -1,6 +1,7 @@
 import { LiveVoteTotalsProvider } from "@/components/live-vote-totals"
 import { PosterCard } from "@/components/poster-card"
 import { RankingDialog } from "@/components/ranking-dialog"
+import { VoterSessionProvider, VoterStatus } from "@/components/voter-session"
 import { posters } from "@/lib/posters"
 import { connection } from "next/server"
 
@@ -49,19 +50,24 @@ export default async function Page() {
             más te guste.
           </p>
         </div>
-        <div className="col-span-full flex justify-end">
-          <RankingDialog
-            posters={posters.map(({ id, author }) => ({ id, author }))}
-          />
-        </div>
-        <hr className="col-span-full border-t border-[#0a0a0a]" />
-        <LiveVoteTotalsProvider>
-          <div className="col-span-full grid grid-cols-12 gap-6">
-            {shuffledPosters.map(({ id, author, number }) => (
-              <PosterCard key={id} id={id} author={author} number={number} />
-            ))}
+        <VoterSessionProvider>
+          <div className="col-span-full flex flex-wrap items-center justify-between gap-3">
+            <VoterStatus />
+            <div className="ml-auto">
+              <RankingDialog
+                posters={posters.map(({ id, author }) => ({ id, author }))}
+              />
+            </div>
           </div>
-        </LiveVoteTotalsProvider>
+          <hr className="col-span-full border-t border-[#0a0a0a]" />
+          <LiveVoteTotalsProvider>
+            <div className="col-span-full grid grid-cols-12 gap-6">
+              {shuffledPosters.map(({ id, author, number }) => (
+                <PosterCard key={id} id={id} author={author} number={number} />
+              ))}
+            </div>
+          </LiveVoteTotalsProvider>
+        </VoterSessionProvider>
       </div>
     </main>
   )

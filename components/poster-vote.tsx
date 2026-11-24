@@ -4,6 +4,7 @@ import { type FormEvent, useContext, useEffect, useState } from "react"
 
 import { cn } from "@/lib/utils"
 import { LiveVoteTotals } from "./live-vote-totals"
+import { useVoterSession } from "./voter-session"
 
 type VoteSummary = {
   total: number
@@ -34,6 +35,8 @@ export function PosterVote({
   const [submitted, setSubmitted] = useState(false)
   const [error, setError] = useState(false)
   const [retry, setRetry] = useState(0)
+  const voter = useVoterSession()
+  const [limitHit, setLimitHit] = useState(false)
 
   useEffect(() => {
     const controller = new AbortController()
@@ -49,13 +52,23 @@ export function PosterVote({
     return () => controller.abort()
   }, [endpoint, retry])
 
-  const selected = draftRating ?? summary?.rating ?? 0
+  // La nota propia sale de la sesión (compartida por todas las tarjetas).
+  const savedRating = voter.session?.email
+    ? (voter.session.votes[poster] ?? null)
+    : null
+  const selected = draftRating ?? savedRating ?? 0
   const closed = summary !== null && !summary.open
+  // Con el cupo agotado solo se puede cambiar la nota de lo ya votado.
+  const usedVotes = Object.keys(voter.session?.votes ?? {}).length
+  const outOfVotes =
+    savedRating === null &&
+    (limitHit || (!!voter.session?.email && usedVotes >= voter.session.max))
   const canSubmit =
     summary !== null &&
     summary.open &&
     selected > 0 &&
-    selected !== summary.rating &&
+    selected !== savedRating &&
+    !outOfVotes &&
     !saving
 
   async function submitVote(event: FormEvent<HTMLFormElement>) {
@@ -65,17 +78,31 @@ export function PosterVote({
     setSaving(true)
     setError(false)
     try {
-      const response = await fetch(endpoint, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ rating: selected }),
-      })
-      if (response.status === 409) setSummary(null)
+      const send = () =>
+        fetch(endpoint, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ rating: selected }),
+        })
+
+      // Sin sesión (o caducada) se pide el correo y se reintenta una vez.
+      let response = voter.session?.email ? await send() : null
+      if (!response || response.status === 401) {
+        if (!(await voter.login())) return
+        response = await send()
+      }
+
+      if (response.status === 409) {
+        setLimitHit(true)
+        voter.refresh()
+        return
+      }
       if (response.status === 423)
         setSummary((loaded) => loaded && { ...loaded, open: false })
       if (!response.ok) throw new Error("No se pudo guardar el voto")
       const { rating }: VoteSummary = await response.json()
-      setSummary((loaded) => loaded && { ...loaded, rating })
+      if (rating !== null) voter.recordVote(poster, rating)
+      setDraftRating(null)
       setSubmitted(true)
     } catch {
       setError(true)
@@ -111,7 +138,7 @@ export function PosterVote({
                 type="button"
                 aria-label={rating === 1 ? "1 punto" : `${rating} puntos`}
                 aria-pressed={rating === selected}
-                disabled={!summary || closed}
+                disabled={!summary || closed || outOfVotes}
                 aria-disabled={saving || undefined}
                 className="flex w-[6cqw] flex-col items-center gap-[0.6cqw] rounded-sm focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-neutral-950 enabled:cursor-pointer"
                 onPointerEnter={(event) => {
@@ -170,6 +197,12 @@ export function PosterVote({
       {closed && (
         <p className="mt-1 text-right text-[length:2.8cqw] text-neutral-500">
           La votación solo está abierta en la web oficial.
+        </p>
+      )}
+      {!closed && outOfVotes && (
+        <p className="mt-1 text-right text-[length:2.8cqw] text-neutral-500">
+          Ya has votado {voter.session?.max ?? 3} carteles. Puedes cambiar la
+          nota de los que ya votaste.
         </p>
       )}
       <p
