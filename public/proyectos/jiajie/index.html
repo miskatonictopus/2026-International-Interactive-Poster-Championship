@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#080d20">
+  <meta name="description" content="Ningún niño sin Navidad. Campaña solidaria de Fundación ITACA L'Hospitalet.">
+  <title>Ningún niño sin Navidad — Fundación ITACA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&family=Fraunces:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="main.js" defer></script>
+</head>
+<body>
+  <main class="stage" aria-label="Cartel interactivo de la campaña Ningún niño sin Navidad">
+    <article class="poster" id="poster">
+      <div class="poster-grain" aria-hidden="true"></div>
+      <div class="cursor-glow" aria-hidden="true"></div>
+      <div class="orbit orbit-one" data-depth="0.38" aria-hidden="true"></div>
+      <div class="orbit orbit-two" data-depth="0.7" aria-hidden="true"></div>
+      <div class="ambient-field" id="ambient-field" aria-hidden="true"></div>
+      <div class="winter-glow" aria-hidden="true"></div>
+      <div class="snowfall" id="snowfall" aria-hidden="true"></div>
+      <svg class="light-route" viewBox="0 0 848 1200" preserveAspectRatio="none" aria-hidden="true">
+        <defs>
+          <path id="poster-light-path" d="M92 240 C230 235 224 308 153 357 C82 407 84 523 150 585 C230 659 438 632 532 685 C626 738 638 849 744 827"/>
+          <filter id="poster-light-blur" x="-200%" y="-200%" width="500%" height="500%"><feGaussianBlur stdDeviation="7"/></filter>
+        </defs>
+        <use class="light-route-track" href="#poster-light-path"/>
+        <circle class="moving-light-halo" r="14"><animateMotion dur="10s" repeatCount="indefinite" path="M92 240 C230 235 224 308 153 357 C82 407 84 523 150 585 C230 659 438 632 532 685 C626 738 638 849 744 827"/></circle>
+        <circle class="moving-light-core" r="4"><animateMotion dur="10s" repeatCount="indefinite" path="M92 240 C230 235 224 308 153 357 C82 407 84 523 150 585 C230 659 438 632 532 685 C626 738 638 849 744 827"/></circle>
+      </svg>
+      <span class="winter-detail snowflake-one" aria-hidden="true">✦</span>
+      <span class="winter-detail snowflake-two" aria-hidden="true">✦</span>
+
+      <header class="masthead layer" data-depth="0.28">
+        <div class="brand-lockup">
+          <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+          <span class="brand-name">FUNDACIÓ ITACA <b>✳</b> L'HOSPITALET</span>
+        </div>
+        <span class="campaign-tag"><span class="tag-star">✳</span> CAMPAÑA SOLIDARIA DE NAVIDAD</span>
+      </header>
+
+      <div class="hanging-lights" aria-hidden="true"><span class="hanger star">✧</span><span class="hanger snow">✧</span><span class="hanger star">✧</span><span class="hanger snow">✧</span><span class="hanger star">✧</span><span class="hanger snow">✧</span><span class="hanger star">✧</span><span class="hanger snow">✧</span><span class="hanger star">✧</span></div>
+      <div class="date-stamp layer" data-depth="0.5" aria-label="21 de diciembre">
+        <span class="date-day">21</span><span class="date-month">DE<br>DICIEMBRE</span>
+      </div>
+
+      <section class="headline layer" data-depth="0.2" aria-label="Ningún niño sin Navidad">
+        <p class="eyebrow"><span></span> UNA NAVIDAD PARA TODOS</p>
+        <h1><span class="line line-one">NINGÚN</span><span class="line line-two">NIÑO</span><span class="line line-three">SIN</span><span class="line line-four">NAVIDAD</span></h1>
+        <span class="headline-note">LA MAGIA<br>SE COMPARTE <b>↗</b></span>
+      </section>
+            <div class="gift gift-blue layer" data-depth="1.3" tabindex="0" role="img" aria-label="Regalo azul flotante"><span class="gift-lid"></span><span class="gift-ribbon"></span><span class="gift-bow"></span></div>
+      <div class="gift gift-coral layer" data-depth="-1" tabindex="0" role="img" aria-label="Regalo coral flotante"><span class="gift-lid"></span><span class="gift-ribbon"></span><span class="gift-bow"></span></div>
+      <div class="gift gift-yellow layer" data-depth="0.8" tabindex="0" role="img" aria-label="Regalo amarillo flotante"><span class="gift-lid"></span><span class="gift-ribbon"></span><span class="gift-bow"></span></div>
+      <div class="gift gift-violet layer" data-depth="-0.75" tabindex="0" role="img" aria-label="Regalo violeta flotante"><span class="gift-lid"></span><span class="gift-ribbon"></span><span class="gift-bow"></span></div>
+
+      <button class="christmas-tree" id="christmas-tree" type="button" aria-label="Encender las luces del árbol de Navidad" aria-pressed="false">
+        <span class="tree-star" aria-hidden="true">✦</span>
+        <span class="tree-tier tree-tier-top" aria-hidden="true"></span>
+        <span class="tree-tier tree-tier-middle" aria-hidden="true"></span>
+        <span class="tree-tier tree-tier-bottom" aria-hidden="true"></span>
+        <span class="tree-trunk" aria-hidden="true"></span>
+        <span class="tree-garland garland-top" aria-hidden="true"></span><span class="tree-garland garland-middle" aria-hidden="true"></span><span class="tree-garland garland-bottom" aria-hidden="true"></span>
+        <span class="tree-bauble bauble-a" aria-hidden="true"></span><span class="tree-bauble bauble-b" aria-hidden="true"></span><span class="tree-bauble bauble-c" aria-hidden="true"></span><span class="tree-bauble bauble-d" aria-hidden="true"></span><span class="tree-bauble bauble-e" aria-hidden="true"></span>
+        <span class="tree-light light-one" aria-hidden="true"></span><span class="tree-light light-two" aria-hidden="true"></span>
+        <span class="tree-light light-three" aria-hidden="true"></span><span class="tree-light light-four" aria-hidden="true"></span>
+        <span class="tree-light light-five" aria-hidden="true"></span><span class="tree-light light-six" aria-hidden="true"></span>
+        <span class="tree-light light-seven" aria-hidden="true"></span><span class="tree-light light-eight" aria-hidden="true"></span>
+        <span class="tree-light light-nine" aria-hidden="true"></span><span class="tree-light light-ten" aria-hidden="true"></span>
+        <span class="tree-mini-gift" aria-hidden="true"></span>
+        <span class="tree-sparkle sparkle-left" aria-hidden="true">✦</span><span class="tree-sparkle sparkle-right" aria-hidden="true">✦</span><span class="tree-sparkle sparkle-low" aria-hidden="true">✦</span>
+      </button>
+
+      <svg class="teddy-bear" viewBox="0 0 100 120" role="button" tabindex="0" aria-pressed="false" aria-label="Hacer bailar al osito">
+        <defs>
+          <radialGradient id="teddy-fur-3d" cx="30%" cy="22%" r="82%"><stop stop-color="#f2c49d"/><stop offset=".48" stop-color="#d39a6a"/><stop offset="1" stop-color="#8f563c"/></radialGradient>
+          <radialGradient id="teddy-face-3d" cx="32%" cy="22%" r="84%"><stop stop-color="#f7d4ae"/><stop offset=".58" stop-color="#d39a6a"/><stop offset="1" stop-color="#9f6244"/></radialGradient>
+          <radialGradient id="teddy-muzzle-3d" cx="35%" cy="25%" r="85%"><stop stop-color="#fff0d7"/><stop offset="1" stop-color="#d6a887"/></radialGradient>
+          <linearGradient id="teddy-scarf-3d" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffabc0"/><stop offset=".55" stop-color="#ff648c"/><stop offset="1" stop-color="#b92f5b"/></linearGradient>
+        </defs>
+        <circle class="teddy-ear" cx="27" cy="23" r="16"/><circle class="teddy-ear-inner" cx="27" cy="23" r="8"/>
+        <circle class="teddy-ear" cx="73" cy="23" r="16"/><circle class="teddy-ear-inner" cx="73" cy="23" r="8"/>
+        <ellipse class="teddy-body" cx="50" cy="82" rx="29" ry="32"/><ellipse cx="40" cy="69" rx="11" ry="5" fill="#fff4df" opacity=".24"/>
+        <ellipse class="teddy-limb" cx="23" cy="76" rx="12" ry="22" transform="rotate(-25 23 76)"/>
+        <ellipse class="teddy-limb" cx="77" cy="76" rx="12" ry="22" transform="rotate(25 77 76)"/>
+        <ellipse class="teddy-limb" cx="35" cy="106" rx="17" ry="10"/><ellipse class="teddy-limb" cx="65" cy="106" rx="17" ry="10"/>
+        <circle class="teddy-head" cx="50" cy="42" r="30"/><ellipse cx="38" cy="27" rx="11" ry="5" fill="#fff7e8" opacity=".26"/>
+        <ellipse class="teddy-muzzle" cx="50" cy="51" rx="15" ry="11"/>
+        <circle class="teddy-eye" cx="40" cy="40" r="2.5"/><circle class="teddy-eye" cx="60" cy="40" r="2.5"/>
+        <ellipse class="teddy-nose" cx="50" cy="48" rx="4" ry="3"/>
+        <path class="teddy-scarf" d="M25 66Q50 77 75 66M68 70l5 15 9-8"/>
+        <path class="teddy-patch" d="m50 82 3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z"/>
+      </svg>
+      <span class="spark spark-a layer" data-depth="1.8" aria-hidden="true">✦</span>
+      <span class="spark spark-b layer" data-depth="-1.5" aria-hidden="true">✦</span>
+      <span class="spark spark-c layer" data-depth="1.1" aria-hidden="true">✦</span>
+      <span class="spark spark-d layer" data-depth="-0.8" aria-hidden="true">✦</span>
+      <span class="spark spark-e layer" data-depth="1.4" aria-hidden="true">✦</span>
+      <span class="spark spark-f layer" data-depth="-1.3" aria-hidden="true">✦</span>
+      <span class="spark spark-g layer" data-depth="0.7" aria-hidden="true">✦</span>
+
+      <div class="message layer" data-depth="0.15">
+        <span class="message-rule"></span>
+        <p>«TU GENEROSIDAD PUEDE<br>CONVERTIRSE EN SU MAYOR <em>ILUSIÓN.</em>»</p>
+      </div>
+
+      <footer class="footer layer" data-depth="0.25">
+        <div class="cta-block">
+          <span class="cta-kicker">ESTA NAVIDAD, REGALA ALGO QUE DURA</span>
+          <div class="cta-title">HAZ TU DONACIÓN <span>↗</span></div>
+          <div class="cta-subtitle">REGALA ILUSIÓN</div>
+        </div>
+        <div class="footer-bottom">
+          <p>Cada aportación cuenta.<br>Ayúdanos a llenar de ilusión esta Navidad.</p>
+          <div class="footer-brand"><span>UNA INICIATIVA DE</span><strong>FUNDACIÓ<br>ITACA</strong><small>L'HOSPITALET</small></div>
+        </div>
+        <span class="footer-index">SOLIDARIDAD <i>×</i> ESPERANZA <i>×</i> ILUSIÓN</span>
+      </footer>
+    </article>
+  </main>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
