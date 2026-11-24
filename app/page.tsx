@@ -1,5 +1,6 @@
 import { LiveVoteTotalsProvider } from "@/components/live-vote-totals"
-import { PosterVote } from "@/components/poster-vote"
+import { PosterCard } from "@/components/poster-card"
+import { RankingDialog } from "@/components/ranking-dialog"
 import { posters } from "@/lib/posters"
 
 export default function Page() {
@@ -29,25 +30,16 @@ export default function Page() {
             más te guste.
           </p>
         </div>
+        <div className="col-span-full flex justify-end">
+          <RankingDialog
+            posters={posters.map(({ id, author }) => ({ id, author }))}
+          />
+        </div>
         <hr className="col-span-full border-t border-[#0a0a0a]" />
         <LiveVoteTotalsProvider>
           <div className="col-span-full grid grid-cols-12 gap-6">
             {posters.map(({ id, author }, index) => (
-              <figure
-                key={id}
-                className="@container col-span-12 sm:col-span-6 lg:col-span-4 2xl:col-span-3"
-              >
-                <div className="bg-white p-[10px] shadow-sm">
-                  <iframe
-                    src={`/proyectos/${id}/index.html`}
-                    title={`Póster animado de ${author}`}
-                    className="block aspect-[848/1200] w-full border-0 bg-[#fafafa]"
-                  />
-                </div>
-                <figcaption className="mt-3">
-                  <PosterVote poster={id} author={author} number={index + 1} />
-                </figcaption>
-              </figure>
+              <PosterCard key={id} id={id} author={author} number={index + 1} />
             ))}
           </div>
         </LiveVoteTotalsProvider>
