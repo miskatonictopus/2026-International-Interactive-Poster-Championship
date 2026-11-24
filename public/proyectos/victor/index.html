@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Regala ilusión: cartel interactivo de la Fundación ITACA para la campaña solidaria del 21 de diciembre.">
+  <title>Regala Ilusión · Fundación ITACA</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+
+  <!-- Tipografías: Bodoni Moda (display de alto contraste) y Archivo (grotesca de ancho variable) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="escenario">
+    <div class="marco" id="marco">
+
+      <!-- ===================== CARTEL 848 × 1200 ===================== -->
+      <main class="cartel" id="cartel" aria-label="Cartel Regala Ilusión, Fundación ITACA, 21 de diciembre">
+
+        <!-- ---------- Pared crema donde cuelga la guirnalda ---------- -->
+        <div class="pared" aria-hidden="true"></div>
+        <div class="luz" id="luz" aria-hidden="true"></div>
+
+        <!-- Titular real para lectores de pantalla y buscadores -->
+        <h1 class="solo-lectura">Regala ilusión</h1>
+
+        <!-- Sombras proyectadas por los adornos (las mueve JS según la luz) -->
+        <div class="sombras" id="sombras" aria-hidden="true"></div>
+
+        <!-- La guirnalda: 13 adornos generados con JavaScript (main.js → ADORNOS) -->
+        <div class="guirnalda" id="guirnalda" role="group" aria-label="Guirnalda de adornos: cada letra suena al tocarla"></div>
+
+        <!-- Mensaje del final (al tocar todos los adornos) -->
+        <p class="aviso" id="aviso" aria-live="polite"></p>
+
+        <!-- ---------- Bloque rojo: información y llamada a la acción ---------- -->
+        <section class="bloque">
+          <div class="fecha">
+            <p class="fecha-dia" aria-label="21">21</p>
+            <p class="fecha-lema">Un pequeño gesto · una gran sonrisa</p>
+          </div>
+
+          <div class="mensaje">
+            <p class="mensaje-mes">de diciembre</p>
+            <p class="cita">«Esta Navidad, tu pequeño gesto puede cambiar una sonrisa».</p>
+            <p class="cuerpo">
+              Con tu <strong>donación económica</strong> compramos regalos para niños y niñas
+              en <strong>riesgo de exclusión social</strong> de L’Hospitalet de Llobregat.
+              Porque la ilusión no debería depender de dónde naces.
+            </p>
+          </div>
+
+          <div class="accion">
+            <!-- COLABORA: etiqueta de regalo que se balancea y se da la vuelta -->
+            <div class="colgante">
+              <svg class="cordel" viewBox="0 0 120 90" aria-hidden="true">
+                <path d="M74 62 C52 60 40 40 52 26 C62 14 80 22 72 36 C64 50 30 46 18 22 C12 10 10 4 6 0"
+                      fill="none" stroke="#E9C271" stroke-width="2.2" stroke-linecap="round"/>
+              </svg>
+              <button class="etiqueta" id="cta" type="button" aria-describedby="ctaNota">
+                <span class="etiqueta-cara etiqueta-cara--frente">
+                  <span class="etiqueta-ojal" aria-hidden="true"></span>
+                  <span class="etiqueta-texto">Colabora</span>
+                  <svg class="etiqueta-flecha" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h16M13 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="square"/></svg>
+                </span>
+                <span class="etiqueta-cara etiqueta-cara--dorso" aria-hidden="true">
+                  <span class="etiqueta-ojal"></span>
+                  <span class="etiqueta-texto">¡Gracias!</span>
+                </span>
+              </button>
+            </div>
+            <p class="accion-nota" id="ctaNota">Dona antes del 21 de diciembre. Cada euro se convierte en ilusión.</p>
+
+            <p class="marca">
+              <span class="marca-sup">Fundación</span>
+              <span class="marca-nombre">ITACA</span>
+              <span class="marca-lugar">L’Hospitalet de Llobregat · Navidad 2026</span>
+            </p>
+          </div>
+        </section>
+
+        <!-- Franja final con el logotipo de Planeta FP -->
+        <footer class="pie">
+          <img class="logo-planeta" src="assets/logo-planeta-fp.png" alt="Planeta FP" width="786" height="223">
+        </footer>
+
+        <!-- Partículas generadas con JavaScript -->
+        <div class="destellos" id="destellos" aria-hidden="true"></div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Indicaciones y sonido (fuera del cartel) -->
+  <div class="barra">
+    <p class="pista" id="pista">Roza los adornos con el cursor · haz clic para que suenen</p>
+    <button class="sonido" id="sonido" type="button" aria-pressed="true">♪ Sonido: sí</button>
+  </div>
+
+  <script src="main.js" defer></script>
+</body>
+</html>

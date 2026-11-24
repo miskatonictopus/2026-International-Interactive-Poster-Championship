@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>¡Pequeños gestos, grandes ilusiones! · AE Itaca</title>
+  <meta name="description" content="Cartel interactivo de la campaña solidaria de Navidad de la Associació Educativa Itaca: con una donación regalas ilusión a un niño o niña. 21 de diciembre.">
+
+  <!-- Favicon inline (evita el error 404 de /favicon.ico en la consola) -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230E3B2C'/%3E%3Crect x='5' y='13' width='22' height='15' fill='%23C8323C' stroke='%23111' stroke-width='2'/%3E%3Crect x='3' y='8' width='26' height='6' fill='%23E8C766' stroke='%23111' stroke-width='2'/%3E%3C/svg%3E">
+
+  <!-- Tipografías: Big Shoulders Display (variable), Fraunces (título y detalles), Mountains of Christmas (pegatina, festiva), Archivo (textos) y Luckiest Guy (cartas) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@100..900&family=Archivo:wght@400..800&family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=Mountains+of+Christmas:wght@700&family=Luckiest+Guy&display=swap">
+
+  <link rel="stylesheet" href="style.css">
+  <script src="main.js" defer></script>
+</head>
+<body>
+
+  <!-- Formas reutilizables (se usan con <use> y textPath) -->
+  <svg class="sr-defs" aria-hidden="true" focusable="false">
+    <!-- Explosión de cómic -->
+    <symbol id="explosion" viewBox="-100 -100 200 200">
+      <polygon points="0,-96 16,-52 52,-80 44,-34 92,-40 58,-6 98,22 50,28 70,72 26,52 10,98 -8,56 -46,86 -40,40 -90,44 -56,8 -96,-22 -50,-28 -74,-70 -28,-50"/>
+    </symbol>
+    <!-- Emblema del dorso de las cartas (guiño a las cartas coleccionables):
+         esfera partida en rojo y crema, franja de tinta y botón con estrella dorada -->
+    <symbol id="emblema" viewBox="-60 -60 120 120">
+      <path d="M -52 0 A 52 52 0 0 1 52 0 Z" fill="#E2504C"/>
+      <path d="M -52 0 A 52 52 0 0 0 52 0 Z" fill="#FFF8EC"/>
+      <path d="M -30 -34 A 40 40 0 0 1 -6 -42" fill="none" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round" opacity="0.6"/>
+      <rect x="-52" y="-5" width="104" height="10" fill="#15291F"/>
+      <circle r="52" fill="none" stroke="#15291F" stroke-width="6"/>
+      <circle r="19" fill="#FFF8EC" stroke="#15291F" stroke-width="6"/>
+      <polygon points="0,-12 3.5,-4 12,-3.7 5.4,1.8 7.6,10 0,5.4 -7.6,10 -5.4,1.8 -12,-3.7 -3.5,-4" fill="#F4C55C" stroke="#15291F" stroke-width="2" stroke-linejoin="round"/>
+    </symbol>
+    <!-- Ramita de acebo: tres hojas que se mecen por separado y bayas rojas con brillo -->
+    <symbol id="acebo" viewBox="0 0 130 130">
+      <g transform="translate(20 20) rotate(8)">
+        <path class="acebo__hoja acebo__hoja--1" d="M0 0 Q6 -9 12 -8 L16 -15 L22 -9 L30 -14 L34 -7 L44 -12 L46 -4 L56 -8 L56 -1 L68 0 L56 1 L56 8 L46 4 L44 12 L34 7 L30 14 L22 9 L16 15 L12 8 Q6 9 0 0 Z"/>
+        <path class="acebo__nervio" d="M4 0 L62 0"/>
+      </g>
+      <g transform="translate(20 20) rotate(46)">
+        <path class="acebo__hoja acebo__hoja--2 acebo__hoja--clara" d="M0 0 Q6 -9 12 -8 L16 -15 L22 -9 L30 -14 L34 -7 L44 -12 L46 -4 L56 -8 L56 -1 L68 0 L56 1 L56 8 L46 4 L44 12 L34 7 L30 14 L22 9 L16 15 L12 8 Q6 9 0 0 Z"/>
+        <path class="acebo__nervio" d="M4 0 L62 0"/>
+      </g>
+      <g transform="translate(20 20) rotate(84)">
+        <path class="acebo__hoja acebo__hoja--3" d="M0 0 Q6 -9 12 -8 L16 -15 L22 -9 L30 -14 L34 -7 L44 -12 L46 -4 L56 -8 L56 -1 L68 0 L56 1 L56 8 L46 4 L44 12 L34 7 L30 14 L22 9 L16 15 L12 8 Q6 9 0 0 Z"/>
+        <path class="acebo__nervio" d="M4 0 L62 0"/>
+      </g>
+      <circle class="acebo__baya" cx="22" cy="22" r="8"/>
+      <circle class="acebo__baya" cx="35" cy="17" r="7"/>
+      <circle class="acebo__baya" cx="18" cy="35" r="7"/>
+      <circle class="acebo__brillo" cx="19" cy="19" r="2.2"/>
+      <circle class="acebo__brillo" cx="33" cy="15" r="2"/>
+      <circle class="acebo__brillo" cx="16" cy="33" r="2"/>
+    </symbol>
+    <!-- FILTRO CÓMIC para Santa: un poco más de color y contorno oscuro alrededor de la silueta -->
+    <filter id="filtro-comic" x="-10%" y="-10%" width="120%" height="120%" color-interpolation-filters="sRGB">
+      <feColorMatrix in="SourceGraphic" type="saturate" values="1.15" result="color"/>
+      <feMorphology in="SourceAlpha" operator="dilate" radius="3" result="silueta"/>
+      <feFlood flood-color="#15291F" result="tinta"/>
+      <feComposite in="tinta" in2="silueta" operator="in" result="contorno"/>
+      <feMerge>
+        <feMergeNode in="contorno"/>
+        <feMergeNode in="color"/>
+      </feMerge>
+    </filter>
+    <!-- Ventanas encendidas de la ciudad -->
+    <pattern id="ventanas" width="16" height="20" patternUnits="userSpaceOnUse">
+      <rect x="4" y="5" width="5" height="7" fill="#FFE45C"/>
+    </pattern>
+    <!-- Curvas para el texto del reverso de las cartas (como en el pen de las cartas) -->
+    <path id="curva-convexa" d="M 12,62 Q 100,8 188,62"/>
+    <path id="curva-concava" d="M 16,12 Q 100,58 184,12"/>
+  </svg>
+
+  <!--
+    LIENZO DEL CARTEL: 848 × 1200 px fijos (proporción A3).
+    Todo se posiciona en px dentro de este contenedor.
+    JS lo escala con transform: scale() para que quepa en la ventana.
+  -->
+  <main class="poster" id="poster" aria-label="Cartel: campaña solidaria de Navidad de AE Itaca, 21 de diciembre">
+
+    <!-- ESCENARIO: anochecer de Navidad en el barrio (guiño vaporwave) ====== -->
+
+    <!-- Cielo: azul noche con un resplandor cálido de atardecer en el horizonte -->
+    <div class="cielo" aria-hidden="true"></div>
+
+    <!-- Estrellas: dos capas que parpadean a destiempo -->
+    <div class="capa estrellas estrellas--a" data-depth="0.15" aria-hidden="true"></div>
+    <div class="capa estrellas estrellas--b" data-depth="0.25" aria-hidden="true"></div>
+
+    <!-- Estrellas fugaces: JS las crea al azar mientras el ratón está sobre el cielo -->
+    <div class="fugaces" id="fugaces" aria-hidden="true"></div>
+
+    <!-- El barrio con las ventanas encendidas -->
+    <svg class="ciudad" data-depth="0.3" viewBox="0 0 848 160" preserveAspectRatio="none" aria-hidden="true">
+      <path class="ciudad__edificios" d="M0 160 V70 H50 V40 H95 V90 H120 V20 H170 V60 H210 V30 H240 V10 H262 V30 H290 V80 H330 V50 H380 V25 H420 V65 H460 V35 H500 V75 H540 V15 H580 V55 H620 V40 H660 V85 H700 V30 H745 V60 H790 V45 H848 V160 Z"/>
+      <path class="ciudad__ventanas" d="M0 160 V70 H50 V40 H95 V90 H120 V20 H170 V60 H210 V30 H240 V10 H262 V30 H290 V80 H330 V50 H380 V25 H420 V65 H460 V35 H500 V75 H540 V15 H580 V55 H620 V40 H660 V85 H700 V30 H745 V60 H790 V45 H848 V160 Z"/>
+    </svg>
+
+    <!-- Suelo en perspectiva con formas navideñas muy suaves (guiño vaporwave) -->
+    <div class="rejilla" data-depth="0.4" aria-hidden="true"></div>
+
+    <!-- Estela de luz dorada muy suave -->
+    <svg class="estelas" viewBox="0 0 848 1200" aria-hidden="true">
+      <path class="estela" d="M -40 560 C 180 430, 420 520, 900 300"/>
+    </svg>
+
+    <!-- Colina nevada delantera -->
+    <svg class="colina colina--delante" data-depth="0.5" viewBox="0 0 900 480" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M-20 90 Q 260 10 520 70 T 920 50 L920 500 L-20 500 Z"/>
+    </svg>
+
+    <!-- Nieve: la dibuja JS en un canvas; el viento sigue al ratón -->
+    <canvas class="nieve" id="nieve" width="848" height="1200" aria-hidden="true"></canvas>
+
+
+    <!-- ZONA HERO ======================================================== -->
+
+    <!-- CABECERA: recuadros de narración de cómic -->
+    <header class="cabecera">
+      <p class="cabecera__recuadro">Campaña solidaria de Navidad · AE Itaca · 2026</p>
+    </header>
+
+    <!-- FECHA: el "21" (fuente variable, peso y sombra según el ratón) + "de diciembre" pegado -->
+    <h1 class="fecha">
+      <span class="fecha__numero" id="fecha-numero">21</span>
+      <span class="fecha__de">de</span>
+      <span class="fecha__mes">diciembre</span>
+    </h1>
+
+    <!-- TÍTULO: el concepto de la campaña -->
+    <!-- TÍTULO minimalista: serif editorial en colores lisos (crema y oro).
+         Al entrar con el ratón en el cartel, un destello lo cruza de lado a lado (JS).
+         Los ✦ titilan siempre. -->
+    <p class="titulo" id="titulo">
+      <span class="titulo__a">Pequeños gestos,</span>
+      <span class="titulo__b">grandes<br>ilusiones</span>
+      <span class="titulo__chispa titulo__chispa--1" aria-hidden="true">✦</span>
+      <span class="titulo__chispa titulo__chispa--2" aria-hidden="true">✦</span>
+      <span class="titulo__chispa titulo__chispa--3" aria-hidden="true">✦</span>
+      <!-- Orla de estrellitas alrededor del título: se encienden una a una al cargar -->
+      <span class="titulo__chispa titulo__chispa--orla titulo__chispa--4" aria-hidden="true">✧</span>
+      <span class="titulo__chispa titulo__chispa--orla titulo__chispa--5" aria-hidden="true">✦</span>
+      <span class="titulo__chispa titulo__chispa--orla titulo__chispa--6" aria-hidden="true">✧</span>
+      <span class="titulo__chispa titulo__chispa--orla titulo__chispa--7" aria-hidden="true">✦</span>
+      <span class="titulo__chispa titulo__chispa--orla titulo__chispa--8" aria-hidden="true">✧</span>
+      <span class="titulo__chispa titulo__chispa--orla titulo__chispa--9" aria-hidden="true">✦</span>
+      <span class="titulo__chispa titulo__chispa--orla titulo__chispa--10" aria-hidden="true">✧</span>
+    </p>
+
+    <!-- PEGATINA DE CÓMIC con el impacto de la donación: flota suavemente sobre el cartel -->
+    <div class="impacto" id="impacto" data-depth="0.6">
+      <!-- Capa de atrás roja y girada: efecto de pegatina doble -->
+      <svg class="impacto__forma impacto__forma--atras" viewBox="-100 -100 200 200" aria-hidden="true">
+        <use href="#explosion" x="-100" y="-100" width="200" height="200"/>
+      </svg>
+      <svg class="impacto__forma" viewBox="-100 -100 200 200" aria-hidden="true">
+        <use href="#explosion" x="-100" y="-100" width="200" height="200"/>
+      </svg>
+      <div class="impacto__texto">
+        <p class="impacto__euros"><span>Una</span>donación</p>
+        <p class="impacto__regalo">= un regalo</p>
+      </div>
+    </div>
+
+
+    <!--
+      SANTA EN TRINEO (SVG de piezas de construcción, con sus propias animaciones:
+      galope, cabeceo, trineo flotando y destellos) + filtro cómic.
+      Empieza a la izquierda. Al entrar con el ratón en el cartel, JS lo hace
+      volar en arco, salir por la derecha y volver por la izquierda.
+    -->
+    <div class="santa" id="santa" aria-hidden="true">
+      <img class="santa__img" src="assets/img/santa-trineo.svg" alt="" width="900" height="420">
+    </div>
+
+    <!-- Onomatopeya que aparece cuando Santa despega o se ríe -->
+    <p class="hohoho pegatina" id="hohoho" aria-hidden="true">¡Ho, ho, ho!</p>
+
+
+    <!--
+      CARTAS COLECCIONABLES ===============================================
+      Cada carta tiene dos caras:
+        · Dorso  → un regalo cerrado (carta misteriosa)
+        · Frente → el regalo abierto y el deseo que esconde
+      JS las coloca en abanico, las gira en 3D (mouseenter/mouseleave)
+      y las inclina siguiendo el ratón (mousemove).
+      Variables por carta:
+        --regalo-color      → color del regalo
+        --cinta-color       → color de la cinta
+        data-color-abierto  → color del regalo al abrirse
+        --retraso           → desfase del balanceo en reposo
+    -->
+    <div class="abanico" id="abanico" data-depth="1">
+
+      <!-- CARTA 1 · Libro -->
+      <article class="carta" data-color-abierto="var(--oro)"
+               style="--regalo-color:var(--baya); --cinta-color:var(--oro); --retraso:0s;">
+        <div class="carta__balanceo">
+          <div class="carta__interior">
+
+            <div class="carta__cara carta__dorso">
+              <div class="carta__dorso-fondo"></div>
+              <svg class="carta__emblema" viewBox="-60 -60 120 120" aria-hidden="true"><use href="#emblema" x="-60" y="-60" width="120" height="120"/></svg>
+              <svg class="carta__dorso-regalo" viewBox="0 0 120 120" aria-hidden="true">
+                <rect class="r-relleno" x="20" y="58" width="80" height="50"/>
+                <rect class="r-cinta" x="52" y="58" width="16" height="50"/>
+                <rect class="r-relleno" x="14" y="40" width="92" height="20"/>
+                <rect class="r-cinta" x="52" y="40" width="16" height="20"/>
+                <ellipse class="r-cinta" cx="47" cy="31" rx="14" ry="10"/>
+                <ellipse class="r-cinta" cx="73" cy="31" rx="14" ry="10"/>
+                <ellipse class="r-brillo" cx="34" cy="80" rx="7" ry="14"/>
+              </svg>
+              <svg class="carta__curva carta__curva--arriba" viewBox="0 0 200 70" aria-hidden="true">
+                <text class="curva-sombra"><textPath href="#curva-convexa" startOffset="50%">Carta regalo</textPath></text>
+                <text class="curva-texto"><textPath href="#curva-convexa" startOffset="50%">Carta regalo</textPath></text>
+              </svg>
+              <svg class="carta__curva carta__curva--abajo" viewBox="0 0 200 70" aria-hidden="true">
+                <text class="curva-sombra"><textPath href="#curva-concava" startOffset="50%">AE Itaca</textPath></text>
+                <text class="curva-texto"><textPath href="#curva-concava" startOffset="50%">AE Itaca</textPath></text>
+              </svg>
+            </div>
+
+            <div class="carta__cara carta__frente">
+              <div class="carta__cuerpo">
+                <header class="carta__cabecera">
+                  <h3 class="carta__nombre">Libro</h3>
+                  <p class="carta__ilusion" aria-label="Ilusión 100">♥ 100</p>
+                </header>
+                <div class="carta__imagen">
+                  <svg viewBox="0 0 180 104" aria-hidden="true">
+                    <g class="carta__icono">
+                      <path class="i-papel" d="M64 26 L90 32 L90 58 L64 52 Z"/>
+                      <path class="i-papel" d="M116 26 L90 32 L90 58 L116 52 Z"/>
+                      <path class="i-linea" d="M70 35 L84 38 M70 42 L84 45 M96 38 L110 35 M96 45 L110 42"/>
+                    </g>
+                    <g class="carta__caja">
+                      <rect class="r-relleno" x="58" y="62" width="64" height="38"/>
+                      <rect class="r-cinta" x="84" y="62" width="12" height="38"/>
+                    </g>
+                    <g class="carta__tapa">
+                      <rect class="r-relleno" x="52" y="50" width="76" height="14"/>
+                      <rect class="r-cinta" x="84" y="50" width="12" height="14"/>
+                      <ellipse class="r-cinta" cx="81" cy="44" rx="10" ry="7"/>
+                      <ellipse class="r-cinta" cx="99" cy="44" rx="10" ry="7"/>
+                    </g>
+                  </svg>
+                </div>
+                <p class="carta__leyenda">Deseo n.º 1</p>
+                <div class="carta__ataque">
+                  <span class="carta__accion">Leer cuentos</span>
+                  <span class="carta__coste">Abre mundos</span>
+                </div>
+                <p class="carta__pie">★ AE Itaca</p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+        <span class="pegatina carta__ono">¡POP!</span>
+      </article>
+
+      <!-- CARTA 2 · Balón -->
+      <article class="carta" data-color-abierto="var(--baya)"
+               style="--regalo-color:var(--oro); --cinta-color:var(--baya); --retraso:-0.8s;">
+        <div class="carta__balanceo">
+          <div class="carta__interior">
+
+            <div class="carta__cara carta__dorso">
+              <div class="carta__dorso-fondo"></div>
+              <svg class="carta__emblema" viewBox="-60 -60 120 120" aria-hidden="true"><use href="#emblema" x="-60" y="-60" width="120" height="120"/></svg>
+              <svg class="carta__dorso-regalo" viewBox="0 0 120 120" aria-hidden="true">
+                <rect class="r-relleno" x="20" y="58" width="80" height="50"/>
+                <rect class="r-cinta" x="52" y="58" width="16" height="50"/>
+                <rect class="r-relleno" x="14" y="40" width="92" height="20"/>
+                <rect class="r-cinta" x="52" y="40" width="16" height="20"/>
+                <ellipse class="r-cinta" cx="47" cy="31" rx="14" ry="10"/>
+                <ellipse class="r-cinta" cx="73" cy="31" rx="14" ry="10"/>
+                <ellipse class="r-brillo" cx="34" cy="80" rx="7" ry="14"/>
+              </svg>
+              <svg class="carta__curva carta__curva--arriba" viewBox="0 0 200 70" aria-hidden="true">
+                <text class="curva-sombra"><textPath href="#curva-convexa" startOffset="50%">Carta regalo</textPath></text>
+                <text class="curva-texto"><textPath href="#curva-convexa" startOffset="50%">Carta regalo</textPath></text>
+              </svg>
+              <svg class="carta__curva carta__curva--abajo" viewBox="0 0 200 70" aria-hidden="true">
+                <text class="curva-sombra"><textPath href="#curva-concava" startOffset="50%">AE Itaca</textPath></text>
+                <text class="curva-texto"><textPath href="#curva-concava" startOffset="50%">AE Itaca</textPath></text>
+              </svg>
+            </div>
+
+            <div class="carta__cara carta__frente">
+              <div class="carta__cuerpo">
+                <header class="carta__cabecera">
+                  <h3 class="carta__nombre">Balón</h3>
+                  <p class="carta__ilusion" aria-label="Ilusión 100">♥ 100</p>
+                </header>
+                <div class="carta__imagen">
+                  <svg viewBox="0 0 180 104" aria-hidden="true">
+                    <g class="carta__icono">
+                      <circle class="i-papel" cx="90" cy="38" r="20"/>
+                      <polygon class="i-tinta" points="90,30 98,36 95,45 85,45 82,36"/>
+                      <path class="i-linea" d="M90 18 V30 M98 36 L109 31 M95 45 L102 55 M85 45 L78 55 M82 36 L71 31"/>
+                    </g>
+                    <g class="carta__caja">
+                      <rect class="r-relleno" x="58" y="62" width="64" height="38"/>
+                      <rect class="r-cinta" x="84" y="62" width="12" height="38"/>
+                    </g>
+                    <g class="carta__tapa">
+                      <rect class="r-relleno" x="52" y="50" width="76" height="14"/>
+                      <rect class="r-cinta" x="84" y="50" width="12" height="14"/>
+                      <ellipse class="r-cinta" cx="81" cy="44" rx="10" ry="7"/>
+                      <ellipse class="r-cinta" cx="99" cy="44" rx="10" ry="7"/>
+                    </g>
+                  </svg>
+                </div>
+                <p class="carta__leyenda">Deseo n.º 2</p>
+                <div class="carta__ataque">
+                  <span class="carta__accion">Marcar goles</span>
+                  <span class="carta__coste">Suma sonrisas</span>
+                </div>
+                <p class="carta__pie">★ AE Itaca</p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+        <span class="pegatina carta__ono">¡ZAS!</span>
+      </article>
+
+      <!-- CARTA 3 · Colores -->
+      <article class="carta" data-color-abierto="var(--baya)"
+               style="--regalo-color:var(--hoja); --cinta-color:var(--oro); --retraso:-1.6s;">
+        <div class="carta__balanceo">
+          <div class="carta__interior">
+
+            <div class="carta__cara carta__dorso">
+              <div class="carta__dorso-fondo"></div>
+              <svg class="carta__emblema" viewBox="-60 -60 120 120" aria-hidden="true"><use href="#emblema" x="-60" y="-60" width="120" height="120"/></svg>
+              <svg class="carta__dorso-regalo" viewBox="0 0 120 120" aria-hidden="true">
+                <rect class="r-relleno" x="20" y="58" width="80" height="50"/>
+                <rect class="r-cinta" x="52" y="58" width="16" height="50"/>
+                <rect class="r-relleno" x="14" y="40" width="92" height="20"/>
+                <rect class="r-cinta" x="52" y="40" width="16" height="20"/>
+                <ellipse class="r-cinta" cx="47" cy="31" rx="14" ry="10"/>
+                <ellipse class="r-cinta" cx="73" cy="31" rx="14" ry="10"/>
+                <ellipse class="r-brillo" cx="34" cy="80" rx="7" ry="14"/>
+              </svg>
+              <svg class="carta__curva carta__curva--arriba" viewBox="0 0 200 70" aria-hidden="true">
+                <text class="curva-sombra"><textPath href="#curva-convexa" startOffset="50%">Carta regalo</textPath></text>
+                <text class="curva-texto"><textPath href="#curva-convexa" startOffset="50%">Carta regalo</textPath></text>
+              </svg>
+              <svg class="carta__curva carta__curva--abajo" viewBox="0 0 200 70" aria-hidden="true">
+                <text class="curva-sombra"><textPath href="#curva-concava" startOffset="50%">AE Itaca</textPath></text>
+                <text class="curva-texto"><textPath href="#curva-concava" startOffset="50%">AE Itaca</textPath></text>
+              </svg>
+            </div>
+
+            <div class="carta__cara carta__frente">
+              <div class="carta__cuerpo">
+                <header class="carta__cabecera">
+                  <h3 class="carta__nombre">Colores</h3>
+                  <p class="carta__ilusion" aria-label="Ilusión 100">♥ 100</p>
+                </header>
+                <div class="carta__imagen">
+                  <svg viewBox="0 0 180 104" aria-hidden="true">
+                    <g class="carta__icono">
+                      <rect class="i-rojo" x="68" y="26" width="12" height="32"/>
+                      <polygon class="i-papel" points="68,26 74,12 80,26"/>
+                      <rect class="i-verde" x="84" y="22" width="12" height="36"/>
+                      <polygon class="i-papel" points="84,22 90,8 96,22"/>
+                      <rect class="i-oro" x="100" y="26" width="12" height="32"/>
+                      <polygon class="i-papel" points="100,26 106,12 112,26"/>
+                    </g>
+                    <g class="carta__caja">
+                      <rect class="r-relleno" x="58" y="62" width="64" height="38"/>
+                      <rect class="r-cinta" x="84" y="62" width="12" height="38"/>
+                    </g>
+                    <g class="carta__tapa">
+                      <rect class="r-relleno" x="52" y="50" width="76" height="14"/>
+                      <rect class="r-cinta" x="84" y="50" width="12" height="14"/>
+                      <ellipse class="r-cinta" cx="81" cy="44" rx="10" ry="7"/>
+                      <ellipse class="r-cinta" cx="99" cy="44" rx="10" ry="7"/>
+                    </g>
+                  </svg>
+                </div>
+                <p class="carta__leyenda">Deseo n.º 3</p>
+                <div class="carta__ataque">
+                  <span class="carta__accion">Pintar sueños</span>
+                  <span class="carta__coste">Da color</span>
+                </div>
+                <p class="carta__pie">★ AE Itaca</p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+        <span class="pegatina carta__ono">¡WOW!</span>
+      </article>
+
+      <!-- CARTA 4 · Puzzle -->
+      <article class="carta" data-color-abierto="var(--hoja)"
+               style="--regalo-color:var(--papel); --cinta-color:var(--baya); --retraso:-2.4s;">
+        <div class="carta__balanceo">
+          <div class="carta__interior">
+
+            <div class="carta__cara carta__dorso">
+              <div class="carta__dorso-fondo"></div>
+              <svg class="carta__emblema" viewBox="-60 -60 120 120" aria-hidden="true"><use href="#emblema" x="-60" y="-60" width="120" height="120"/></svg>
+              <svg class="carta__dorso-regalo" viewBox="0 0 120 120" aria-hidden="true">
+                <rect class="r-relleno" x="20" y="58" width="80" height="50"/>
+                <rect class="r-cinta" x="52" y="58" width="16" height="50"/>
+                <rect class="r-relleno" x="14" y="40" width="92" height="20"/>
+                <rect class="r-cinta" x="52" y="40" width="16" height="20"/>
+                <ellipse class="r-cinta" cx="47" cy="31" rx="14" ry="10"/>
+                <ellipse class="r-cinta" cx="73" cy="31" rx="14" ry="10"/>
+                <ellipse class="r-brillo" cx="34" cy="80" rx="7" ry="14"/>
+              </svg>
+              <svg class="carta__curva carta__curva--arriba" viewBox="0 0 200 70" aria-hidden="true">
+                <text class="curva-sombra"><textPath href="#curva-convexa" startOffset="50%">Carta regalo</textPath></text>
+                <text class="curva-texto"><textPath href="#curva-convexa" startOffset="50%">Carta regalo</textPath></text>
+              </svg>
+              <svg class="carta__curva carta__curva--abajo" viewBox="0 0 200 70" aria-hidden="true">
+                <text class="curva-sombra"><textPath href="#curva-concava" startOffset="50%">AE Itaca</textPath></text>
+                <text class="curva-texto"><textPath href="#curva-concava" startOffset="50%">AE Itaca</textPath></text>
+              </svg>
+            </div>
+
+            <div class="carta__cara carta__frente">
+              <div class="carta__cuerpo">
+                <header class="carta__cabecera">
+                  <h3 class="carta__nombre">Puzzle</h3>
+                  <p class="carta__ilusion" aria-label="Ilusión 100">♥ 100</p>
+                </header>
+                <div class="carta__imagen">
+                  <svg viewBox="0 0 180 104" aria-hidden="true">
+                    <g class="carta__icono">
+                      <path class="i-oro" d="M72 22 h12 a6 6 0 1 1 12 0 h12 v12 a6 6 0 1 1 0 12 v12 h-36 Z"/>
+                    </g>
+                    <g class="carta__caja">
+                      <rect class="r-relleno" x="58" y="62" width="64" height="38"/>
+                      <rect class="r-cinta" x="84" y="62" width="12" height="38"/>
+                    </g>
+                    <g class="carta__tapa">
+                      <rect class="r-relleno" x="52" y="50" width="76" height="14"/>
+                      <rect class="r-cinta" x="84" y="50" width="12" height="14"/>
+                      <ellipse class="r-cinta" cx="81" cy="44" rx="10" ry="7"/>
+                      <ellipse class="r-cinta" cx="99" cy="44" rx="10" ry="7"/>
+                    </g>
+                  </svg>
+                </div>
+                <p class="carta__leyenda">Deseo n.º 4</p>
+                <div class="carta__ataque">
+                  <span class="carta__accion">Pensar juntos</span>
+                  <span class="carta__coste">Une piezas</span>
+                </div>
+                <p class="carta__pie">★ AE Itaca</p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+        <span class="pegatina carta__ono">¡YUPI!</span>
+      </article>
+
+    </div>
+
+
+    <!-- MENSAJE DE SENSIBILIZACIÓN: bocadillo de cómic -->
+    <section class="mensaje">
+      <h2 class="mensaje__titular">Ningún niño ni niña sin regalo.</h2>
+      <p class="mensaje__texto">Tu pequeño gesto, su gran ilusión.</p>
+    </section>
+
+    <!-- LLAMADA A LA ACCIÓN -->
+    <a class="cta" id="cta" href="https://aeitaca.org" target="_blank" rel="noopener">
+      <span>Dona en aeitaca.org</span>
+      <span class="cta__flecha" aria-hidden="true">→</span>
+    </a>
+
+    <!-- BOTÓN DISCRETO junto a las cartas: reinicia el cartel y las baraja -->
+    <button class="reiniciar" id="reiniciar" type="button" title="Barajar las cartas" aria-label="Reiniciar el cartel y barajar las cartas">↻</button>
+
+    <!-- MENSAJE FINAL (oculto hasta el estado final: tecla F o todas las cartas giradas) -->
+    <p class="gracias" id="gracias" aria-live="polite">¡Gracias por convertir un gesto en ilusión!</p>
+
+
+    <!-- FRANJA DE BRANDING =============================================== -->
+    <footer class="branding">
+      <div class="branding__fila">
+        <div class="branding__entidad">
+          <span class="branding__logo-itaca">
+            <img src="assets/img/LogoHD_itaca.webp" alt="Logo de la Associació Educativa Itaca" width="867" height="1200">
+          </span>
+          <p class="branding__nombre">
+            <strong>Associació Educativa Itaca</strong>
+            <span>Construimos oportunidades · desde 1977</span>
+          </p>
+        </div>
+        <p class="branding__sello">★ Entidad declarada de utilidad pública</p>
+      </div>
+
+      <div class="branding__fila branding__fila--apoyo">
+        <p class="branding__etiqueta">Con el apoyo de</p>
+        <img class="branding__colaborador branding__colaborador--gencat" src="assets/img/generalitat-dretssocials.png" alt="Generalitat de Catalunya · Departament de Drets Socials" width="454" height="108">
+        <img class="branding__colaborador branding__colaborador--diba" src="assets/img/Logotip_Diputacio.png" alt="Diputació de Barcelona" width="513" height="170">
+        <img class="branding__colaborador branding__colaborador--lh" src="assets/img/logoLHospi.png" alt="Ajuntament de L'Hospitalet" width="599" height="260">
+        <img class="branding__colaborador branding__colaborador--pfp" src="assets/img/planetafplogo.png" alt="Planeta FP, escuela del alumnado que ha diseñado el cartel" width="786" height="223">
+      </div>
+
+      <address class="branding__contacto">
+        <span>Carrer del Montseny, 22 · 08903 L'Hospitalet de Llobregat</span>
+        <span><strong>934&nbsp;036&nbsp;997</strong> · <strong>info@aeitaca.org</strong></span>
+      </address>
+    </footer>
+
+
+    <!-- MARCO DE ACEBO: ramitas en las esquinas superiores -->
+    <svg class="acebo acebo--izq" viewBox="0 0 130 130" aria-hidden="true"><use href="#acebo"/></svg>
+    <svg class="acebo acebo--der" viewBox="0 0 130 130" aria-hidden="true"><use href="#acebo"/></svg>
+
+  </main>
+
+</body>
+</html>

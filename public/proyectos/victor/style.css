@@ -1,0 +1,622 @@
+/* =====================================================================
+   REGALA ILUSIÓN · Fundación ITACA
+   Hoja de estilos: la pared, la guirnalda de adornos (con luz y sombra
+   controladas por JS), el bloque rojo de información y la etiqueta CTA.
+   ===================================================================== */
+
+/* ---------- 1. Variables de diseño ---------- */
+:root {
+  /* Paleta de la campaña */
+  --rojo:   #A52A2A;
+  --crema:  #F5EAD5;
+  --verde:  #234C3D;
+  --oro:    #D6A84F;
+  --blanco: #FFFFFF;
+
+  /* Tonos derivados */
+  --rojo-osc:  #7E1E1E;
+  --oro-cla:   #E9C271;
+  --oro-osc:   #B8862F;
+  --tinta:     #1C2E26;
+
+  /* Tipografías */
+  --display: "Bodoni Moda", "Didot", "Bodoni MT", Georgia, serif;
+  --sans:    "Archivo", "Arial Narrow", system-ui, sans-serif;
+
+  /* Curvas */
+  --muelle: cubic-bezier(.34, 1.56, .64, 1);
+  --suave:  cubic-bezier(.22, .8, .24, 1);
+
+  /* Escala del cartel: la actualiza main.js según la ventana */
+  --escala: 1;
+}
+
+*,
+*::before,
+*::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body { height: 100%; }
+
+body {
+  overflow: hidden;
+  font-family: var(--sans);
+  color: var(--tinta);
+  background: #0E1813 radial-gradient(ellipse 60% 55% at 50% 40%, #1D3329 0%, transparent 75%);
+  -webkit-font-smoothing: antialiased;
+}
+
+.solo-lectura {
+  position: absolute;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---------- 2. Escenario y escalado proporcional ---------- */
+.escenario {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 16px 16px 40px;      /* abajo queda sitio para la barra de pistas */
+}
+
+.marco {
+  position: relative;
+  width:  calc(848px  * var(--escala));
+  height: calc(1200px * var(--escala));
+  opacity: 0;
+  transition: opacity .5s ease;
+}
+body.escala-lista .marco { opacity: 1; }
+
+.cartel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 848px;
+  height: 1200px;
+  overflow: hidden;
+  transform: scale(var(--escala));
+  transform-origin: 0 0;
+  box-shadow: 0 40px 90px rgba(0, 0, 0, .55), 0 10px 24px rgba(0, 0, 0, .35);
+  isolation: isolate;
+  background: var(--crema);
+}
+
+/* ---------- 3. Pared y lámpara ---------- */
+.pared {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(130% 80% at 50% 18%, #FAF2E2 0%, var(--crema) 45%, #E4D1AE 100%);
+}
+
+/* Halo cálido que sigue al cursor: el cursor es la lámpara */
+.luz {
+  position: absolute;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 640px;
+  height: 640px;
+  margin: -320px 0 0 -320px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 251, 238, .9) 0%, rgba(255, 251, 238, .35) 30%, rgba(255, 251, 238, 0) 62%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .7s ease;
+}
+
+/* ---------- 4. Guirnalda ---------- */
+.sombras,
+.guirnalda { position: absolute; inset: 0; }
+.sombras   { z-index: 2; pointer-events: none; }
+.guirnalda { z-index: 3; pointer-events: none; }
+
+/* Sombra de cada adorno sobre la pared */
+.sombra-adorno {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: var(--d);
+  height: var(--d);
+  border-radius: 50%;
+  background: rgba(74, 34, 16, .3);
+  filter: blur(9px);
+  will-change: transform;
+}
+
+/* Un adorno = hilo + anilla + casquillo + bola. Gira desde su punto de anclaje (arriba) */
+.adorno {
+  position: absolute;
+  top: 0;
+  width: var(--d);
+  height: calc(var(--lc) + var(--d) / 2);
+  margin-left: calc(var(--d) / -2);
+  transform-origin: 50% 0;
+  will-change: transform;
+}
+
+.hilo {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 1.5px;
+  margin-left: -.75px;
+  height: calc(var(--lc) - var(--d) / 2 - 18px);
+  background: linear-gradient(rgba(140, 100, 40, .35), #9C7A3C);
+}
+
+.anilla {
+  position: absolute;
+  left: 50%;
+  top: calc(var(--lc) - var(--d) / 2 - 22px);
+  width: 10px;
+  height: 12px;
+  margin-left: -5px;
+  border: 2px solid var(--oro-osc);
+  border-radius: 50%;
+}
+
+.casquillo {
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  top: calc(var(--lc) - var(--d) / 2 - 12px);
+  width: calc(var(--d) * .26);
+  height: 17px;
+  transform: translateX(-50%);
+  border-radius: 3px 3px 1px 1px;
+  background:
+    linear-gradient(90deg, rgba(0,0,0,.25), transparent 30%, rgba(255,255,255,.35) 45%, transparent 60%, rgba(0,0,0,.3)),
+    repeating-linear-gradient(90deg, var(--oro-cla) 0 3px, var(--oro-osc) 3px 5px);
+  box-shadow: inset 0 -3px 0 rgba(0, 0, 0, .22), inset 0 2px 0 rgba(255, 255, 255, .3);
+}
+
+.bola-giro {
+  position: absolute;
+  left: 0;
+  top: calc(var(--lc) - var(--d) / 2);
+  width: var(--d);
+  height: var(--d);
+  perspective: 500px;
+}
+
+/* La bola: capas de fondo = reflejo, sombreado, motivo y color base.
+   --hx / --hy (posición de la luz, en coordenadas locales) las calcula JS. */
+.bola {
+  --hx: 34%;
+  --hy: 30%;
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+  pointer-events: auto;
+  color: var(--letra);
+  font-family: var(--display);
+  font-weight: 900;
+  font-size: calc(var(--d) * .56);
+  font-variation-settings: "opsz" 28;
+  line-height: 1;
+  background:
+    radial-gradient(circle at var(--hx) var(--hy), rgba(255,255,255,.34) 0%, rgba(255,255,255,0) 34%, rgba(0,0,0,0) 56%, rgba(0,0,0,.42) 100%),
+    var(--patron, linear-gradient(transparent, transparent)),
+    radial-gradient(circle at var(--hx) var(--hy), var(--claro) 0%, var(--base) 48%, var(--oscuro) 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, .12),
+    0 0 0 0 rgba(233, 194, 113, 0);
+  transform: scale(1);
+  transition:
+    transform .5s var(--muelle),
+    box-shadow .45s var(--suave),
+    filter .45s var(--suave);
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Brillo especular por encima de la letra (como el cristal) */
+.bola::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background:
+    radial-gradient(16% 11% at var(--hx) var(--hy), rgba(255,255,255,.95) 0%, rgba(255,255,255,0) 100%),
+    radial-gradient(30% 22% at var(--hx) var(--hy), rgba(255,255,255,.22) 0%, rgba(255,255,255,0) 100%);
+  pointer-events: none;
+}
+
+.bola-letra {
+  position: relative;
+  translate: 0 .02em;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, .2);
+  transition: color .4s ease, text-shadow .4s ease;
+}
+
+/* Colores de las bolas */
+.c-rojo  { --base: var(--rojo);  --claro: #D9604F; --oscuro: #4F1010; --acento: var(--oro);   --letra: var(--crema); }
+.c-verde { --base: var(--verde); --claro: #4F8C72; --oscuro: #0C1E17; --acento: var(--oro);   --letra: var(--oro-cla); }
+.c-oro   { --base: var(--oro);   --claro: #FBE6AC; --oscuro: #85601F; --acento: var(--rojo);  --letra: var(--verde); }
+
+/* Motivos */
+.p-franjas { --patron: linear-gradient(180deg, transparent 0 17%, var(--acento) 17% 22%, transparent 22% 78%, var(--acento) 78% 83%, transparent 83%); }
+.p-puntos  { --patron: radial-gradient(circle, var(--acento) 0 2px, transparent 2.6px) 3px 3px / 15px 15px; }
+.p-gajos   { --patron: repeating-linear-gradient(90deg, rgba(255,255,255,0) 0 9px, rgba(0,0,0,.18) 9px 11px, rgba(255,255,255,.14) 11px 12px); }
+
+/* Estado: encendida (mouseenter / foco / final) */
+.bola.encendida {
+  transform: scale(1.09);
+  filter: brightness(1.14) saturate(1.1);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, .25),
+    0 0 46px 12px rgba(233, 194, 113, .75);
+}
+.bola.encendida .bola-letra {
+  color: var(--blanco);
+  text-shadow: 0 0 14px rgba(255, 236, 190, .9), 0 2px 0 rgba(0, 0, 0, .2);
+}
+
+/* Ya tocada: guarda un aro dorado (progreso hacia el final) */
+.adorno.tocado .anilla { border-color: var(--oro-cla); box-shadow: 0 0 8px rgba(233, 194, 113, .9); }
+
+/* Clic: vuelta completa sobre su eje */
+.bola-giro.gira .bola { animation: vuelta .9s var(--suave); }
+@keyframes vuelta {
+  from { transform: scale(1.09) rotateY(0deg); }
+  to   { transform: scale(1.09) rotateY(360deg); }
+}
+
+.bola:focus-visible { outline: 3px solid var(--verde); outline-offset: 5px; }
+
+/* Mensaje del final */
+.aviso {
+  position: absolute;
+  z-index: 4;
+  left: 48px;
+  right: 48px;
+  top: 640px;
+  text-align: center;
+  font-family: var(--display);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 26px;
+  color: var(--rojo);
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity .6s var(--suave), transform .6s var(--suave);
+  pointer-events: none;
+}
+.aviso.visible { opacity: 1; transform: none; }
+
+/* ---------- 5. Bloque rojo ---------- */
+.bloque {
+  position: absolute;
+  z-index: 5;
+  left: 0;
+  right: 0;
+  top: 690px;
+  bottom: 62px;
+  padding: 32px 48px 28px;
+  display: grid;
+  grid-template-columns: 318px 1fr;
+  grid-template-rows: auto 1fr;
+  column-gap: 30px;
+  background: var(--rojo);
+  color: var(--crema);
+}
+
+.fecha-dia {
+  font-family: var(--display);
+  font-style: italic;
+  font-weight: 900;
+  font-variation-settings: "opsz" 96;
+  font-size: 300px;
+  line-height: .74;
+  letter-spacing: -.04em;
+  color: var(--oro);
+  margin: 6px 0 0 -10px;
+}
+
+.fecha-lema {
+  margin-top: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  font-stretch: 100%;
+  letter-spacing: .06em;
+  white-space: nowrap;
+  text-transform: uppercase;
+  color: var(--oro-cla);
+}
+
+.mensaje { padding-top: 4px; }
+
+.mensaje-mes {
+  font-size: 30px;
+  font-weight: 800;
+  font-stretch: 125%;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: .02em;
+  color: var(--oro);
+  margin-bottom: 18px;
+}
+
+.cita {
+  font-family: var(--display);
+  font-style: italic;
+  font-weight: 500;
+  font-variation-settings: "opsz" 48;
+  font-size: 31px;
+  line-height: 1.08;
+  margin-bottom: 18px;
+  text-wrap: balance;
+}
+
+.cuerpo {
+  font-size: 17px;
+  line-height: 1.5;
+  color: rgba(245, 234, 213, .88);
+  text-wrap: pretty;
+}
+.cuerpo strong { font-weight: 700; color: var(--crema); }
+
+/* Fila inferior: etiqueta · nota · marca */
+.accion {
+  grid-column: 1 / -1;
+  align-self: end;
+  display: grid;
+  grid-template-columns: 318px 1fr auto;
+  column-gap: 30px;
+  align-items: end;
+}
+
+.accion-nota {
+  font-size: 14.5px;
+  line-height: 1.45;
+  font-weight: 500;
+  color: rgba(245, 234, 213, .82);
+  padding-bottom: 6px;
+  max-width: 220px;
+  text-wrap: balance;
+}
+
+.marca {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1;
+  text-align: right;
+}
+.marca-sup {
+  font-size: 14px;
+  font-weight: 600;
+  font-stretch: 125%;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  margin-right: -.3em;
+}
+.marca-nombre {
+  font-size: 46px;
+  font-weight: 900;
+  font-stretch: 125%;
+  letter-spacing: .02em;
+  margin: 4px 0 8px;
+}
+.marca-lugar {
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(245, 234, 213, .75);
+}
+
+/* Franja final: logotipo de Planeta FP sobre crema */
+.pie {
+  position: absolute;
+  z-index: 5;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 62px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--crema);
+}
+.logo-planeta {
+  display: block;
+  width: auto;
+  height: 30px;
+}
+
+/* ---------- 6. COLABORA: etiqueta de regalo ---------- */
+.colgante {
+  position: relative;
+  width: 318px;
+  height: 96px;
+  transform-origin: 34px 48px;          /* gira desde el ojal */
+  transform: rotate(-4deg);
+  transition: transform .6s var(--muelle);
+}
+.colgante:hover { animation: balanceo 1.3s ease-out; }
+@keyframes balanceo {
+  0%   { transform: rotate(-4deg); }
+  25%  { transform: rotate(5deg); }
+  50%  { transform: rotate(-6deg); }
+  75%  { transform: rotate(1deg); }
+  100% { transform: rotate(-4deg); }
+}
+
+.cordel {
+  position: absolute;
+  left: -40px;
+  top: -14px;
+  width: 120px;
+  height: 90px;
+  overflow: visible;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.etiqueta {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  transform-style: preserve-3d;
+  transition: transform .8s var(--muelle);
+  -webkit-tap-highlight-color: transparent;
+}
+.etiqueta.girada { transform: rotateY(180deg); }
+
+.etiqueta-cara {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 0 22px 0 62px;
+  clip-path: polygon(30px 0, 100% 0, 100% 100%, 30px 100%, 0 50%);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.18), transparent 40%, rgba(0,0,0,.08)),
+    var(--oro);
+  color: var(--verde);
+  backface-visibility: hidden;
+  transition: background-color .3s ease;
+}
+.etiqueta-cara--dorso {
+  transform: rotateY(180deg);
+  background: var(--verde);
+  color: var(--oro-cla);
+  justify-content: center;
+}
+
+.etiqueta-ojal {
+  position: absolute;
+  left: 26px;
+  top: 50%;
+  width: 16px;
+  height: 16px;
+  margin-top: -8px;
+  border-radius: 50%;
+  background: var(--rojo);
+  box-shadow: 0 0 0 3px var(--oro-osc), inset 0 2px 3px rgba(0, 0, 0, .35);
+}
+
+.etiqueta-texto {
+  font-family: var(--sans);
+  font-size: 30px;
+  font-weight: 900;
+  font-stretch: 115%;
+  letter-spacing: .02em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+.etiqueta-flecha {
+  width: 26px;
+  height: 26px;
+  flex: none;
+  margin-left: auto;
+  transition: transform .4s var(--muelle);
+}
+.etiqueta:hover .etiqueta-flecha,
+.etiqueta:focus-visible .etiqueta-flecha { transform: translateX(6px); }
+.etiqueta:focus-visible { outline: 3px solid var(--crema); outline-offset: 8px; }
+
+/* ---------- 7. Partículas ---------- */
+.destellos { position: absolute; inset: 0; z-index: 8; pointer-events: none; overflow: hidden; }
+
+.destello {
+  position: absolute;
+  margin: calc(var(--tam) / -2) 0 0 calc(var(--tam) / -2);
+  width: var(--tam);
+  height: var(--tam);
+  clip-path: polygon(50% 0, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0 50%, 39% 39%);
+  animation: destello var(--dur, 900ms) var(--suave) forwards;
+}
+.destello--punto { clip-path: circle(50%); }
+
+@keyframes destello {
+  0%   { opacity: 0; transform: translate(0, 0) scale(.2) rotate(0deg); }
+  15%  { opacity: 1; }
+  100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(1) rotate(var(--giro)); }
+}
+
+/* ---------- 8. Barra inferior (fuera del cartel) ---------- */
+.barra {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  padding: 0 16px;
+  font-size: 13px;
+  letter-spacing: .04em;
+  color: rgba(245, 234, 213, .75);
+}
+.pista { transition: opacity .8s ease; }
+.pista.oculta { opacity: 0; }
+
+.sonido {
+  border: 1px solid rgba(245, 234, 213, .35);
+  border-radius: 4px;
+  padding: 3px 10px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+.sonido:hover { border-color: var(--oro); color: var(--oro-cla); }
+.sonido:focus-visible { outline: 2px solid var(--oro); outline-offset: 2px; }
+
+/* ---------- 9. Entrada: los adornos caen desde arriba ---------- */
+.adorno { opacity: 0; }
+.listo .adorno { animation: caer 1.2s var(--muelle) calc(var(--i) * 70ms) both; }
+@keyframes caer {
+  from { opacity: 0; translate: 0 -160px; }
+  to   { opacity: 1; translate: 0 0; }
+}
+.sombra-adorno { opacity: 0; transition: opacity 1s ease; }
+.listo .sombra-adorno { opacity: 1; transition-delay: calc(var(--i) * 70ms + .4s); }
+
+.bloque > * { opacity: 0; }
+.listo .bloque > * { animation: subir .9s var(--suave) both; }
+.listo .fecha   { animation-delay: .5s; }
+.listo .mensaje { animation-delay: .65s; }
+.listo .accion  { animation-delay: .8s; }
+.pie { opacity: 0; transition: opacity 1s ease 1s; }
+.listo .pie { opacity: 1; }
+@keyframes subir {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* Modo captura (index.html#captura): sin animación de entrada */
+.captura .adorno,
+.captura .bloque > *,
+.captura .sombra-adorno,
+.captura .pie,
+.captura .marco { animation: none !important; opacity: 1 !important; transition: none !important; }
+
+/* ---------- 10. Accesibilidad: movimiento reducido ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .listo .adorno,
+  .listo .bloque > *,
+  .bola-giro.gira .bola,
+  .colgante:hover { animation-duration: .01s; animation-delay: 0s; }
+}
+
+@media (max-height: 600px) {
+  .barra { display: none; }
+  .escenario { padding-bottom: 16px; }
+}

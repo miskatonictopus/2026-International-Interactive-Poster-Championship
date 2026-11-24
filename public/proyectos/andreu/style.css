@@ -1,0 +1,1246 @@
+@charset "UTF-8";
+
+*{
+    box-sizing: border-box;
+}
+
+body{
+    margin: 0;
+    padding: 0;
+    background: #f5f0e5;
+    font-family: Arial, sans-serif;
+}
+
+.cabecera{
+    grid-column: 1;
+    grid-row: 1;
+    z-index: 2;
+    width: min(100%, 288px);
+    height: 64px;
+    display: flex;
+    align-items: center;
+    padding: 8px 24px;
+    background: white;
+}
+
+.cabecera img{
+    display: block;
+    width: 240px;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.cartel{
+    --espaciado-cartel: 24px;
+    position: relative;
+    width: 848px;
+    height: 1200px;
+    zoom: calc(100dvh / 1200px * var(--zoom-navegador, 1) * var(--zoom-manual, 1));
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.cartel::after{
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    height: max(0px, calc(1200px / (var(--zoom-navegador, 1) * var(--zoom-manual, 1)) - 1200px));
+    background: url("images/mesa-continuacion.png") top / 100% auto repeat-y;
+    pointer-events: none;
+}
+
+.controles-zoom{
+    position: fixed;
+    right: 16px;
+    bottom: 16px;
+    z-index: 10;
+    zoom: min(1, calc(100dvh / 600px), calc(100vw / 320px));
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background: white;
+}
+
+.controles-zoom button{
+    width: 24px;
+    height: 24px;
+    border: 1px solid #777;
+    border-radius: 4px;
+    background: white;
+    color: #222;
+    font-size: 17px;
+    cursor: pointer;
+}
+
+.controles-zoom button:disabled{
+    opacity: .5;
+    cursor: default;
+}
+
+.nivel-zoom{
+    min-width: 3em;
+    color: #222;
+    text-align: center;
+    font-size: 11px;
+}
+
+.titulo{
+    position: relative;
+    z-index: 2;
+    grid-column: 1;
+    grid-row: 2;
+    margin: 15px 0 24px;
+    color: white;
+    text-align: center;
+    font-size: 50px;
+    line-height: 1.15;
+    text-shadow: 0 1px 4px #000;
+}
+
+.titulo.siguiendo-cursor{
+    animation: colores-titulo 8s linear infinite;
+}
+
+@keyframes colores-titulo{
+    0%, 100%{ color: white; }
+    25%{ color: #8a2be2; }
+    50%{ color: red; }
+    75%{ color: #00a000; }
+}
+
+.escena-regalo{
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    flex: 1;
+    min-height: 0;
+    padding: var(--espaciado-cartel);
+    background: rgb(216, 153, 34) url("images/decoracion-navidad-sobre-mesa-madera_1252-235.avif") center / 100% 100% no-repeat;
+    text-align: center;
+}
+
+.escena-regalo p{
+    position: relative;
+    width: 100%;
+    margin: 0;
+    padding: 8px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, .8);
+}
+
+.texto-regalo{
+    position: relative;
+    z-index: 1;
+    width: 100%;
+}
+
+.escena-regalo .descripcion-fundacion{
+    width: 90%;
+    margin: 0 auto;
+    color: green;
+    font-size: 30px;
+}
+
+.escena-regalo .fundacion{
+    margin-top: 25px;
+    margin-bottom: 8px;
+    padding: 0;
+    border-radius: 0;
+    background: transparent;
+    color: #76232a;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 50px;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-shadow: 0 1px 0 #fff2d5;
+}
+
+.escena-regalo .fundacion em{
+    font-style: normal;
+}
+
+.escena-regalo .fundacion::before,
+.escena-regalo .fundacion::after{
+    color: #c99a3c;
+    content: "✦";
+    font-size: .7em;
+    vertical-align: .15em;
+}
+
+.escena-regalo .fundacion::before{
+    margin-right: .65em;
+}
+
+.escena-regalo .fundacion::after{
+    margin-left: .65em;
+}
+
+.bolas-navidad{
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    mix-blend-mode: color;
+    pointer-events: none;
+}
+
+.bola-roja{
+    fill: red;
+}
+
+.bola-amarilla{
+    fill: yellow;
+}
+
+body.puntero-raton:hover .bolas-navidad{
+    opacity: 1;
+}
+
+body.puntero-raton:hover .bola-roja{
+    animation: colores-bola-roja var(--duracion-bola, 6s) linear infinite;
+}
+
+body.puntero-raton:hover .bola-amarilla{
+    animation: colores-bola-amarilla var(--duracion-bola, 6s) linear infinite;
+}
+
+@keyframes colores-bola-roja{
+    0%, 100%{ fill: red; }
+    25%{ fill: white; }
+    50%{ fill: green; }
+    75%{ fill: violet; }
+}
+
+@keyframes colores-bola-amarilla{
+    0%, 100%{ fill: yellow; }
+    25%{ fill: orange; }
+    50%{ fill: blue; }
+    75%{ fill: white; }
+}
+
+.regalo{
+    position: absolute;
+    inset: 0 0 121px;
+    overflow: hidden;
+    transform: translateY(-67px);
+}
+
+.contenido-regalo{
+    position: absolute;
+    inset: 60px;
+}
+
+.foto-regalo{
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.cuerpo-regalo-rojo{
+    clip-path: polygon(0 49.3%, 6% 49.3%, 31% 58%, 100% 58%, 100% 100%, 14.3% 100%, 14.3% 92.5%, 10.5% 88.6%, 0 88.6%);
+    transform: scaleY(1.38);
+    transform-origin: 50% 58%;
+}
+
+.lateral-regalo-rojo,
+.lateral-tapa-regalo-rojo{
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+}
+
+.lateral-tapa-regalo-rojo{
+    z-index: 2;
+    transform-origin: 50% 58%;
+}
+
+.tapa-regalo-rojo{
+    z-index: 2;
+    clip-path: polygon(0 0, 100% 0, 100% 58%, 14.3% 58%, 14.3% 47.5%, 10.5% 45%, 4.3% 33.75%, 0 33.75%);
+    transform-origin: 50% 58%;
+}
+
+.retoque-tapa-regalo-rojo{
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    transform-origin: 50% 58%;
+}
+
+.regalo.abierto .tapa-regalo-rojo,
+.regalo.abierto .lateral-tapa-regalo-rojo,
+.regalo.abierto .retoque-tapa-regalo-rojo{
+    animation: girar-tapa-regalo-rojo 1.4s ease-in forwards;
+}
+
+@keyframes girar-tapa-regalo-rojo{
+    0%{
+        opacity: 1;
+        transform: translate(0, 0) rotate(0);
+    }
+    75%{
+        opacity: 1;
+    }
+    100%{
+        opacity: 0;
+        transform: translate(60%, -20%) rotate(90deg) scale(.55);
+    }
+}
+
+.productos-regalo-rojo,
+.zona-regalo-rojo{
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.productos-regalo-rojo{
+    z-index: 3;
+    overflow: visible;
+}
+
+.producto-regalo-rojo{
+    opacity: 0;
+}
+
+.productos-regalo-rojo > g:nth-child(1){
+    --salida-x: -35px;
+    --inicio-producto: .25s;
+}
+
+.productos-regalo-rojo > g:nth-child(2){
+    --salida-x: 0px;
+    --inicio-producto: .4s;
+}
+
+.productos-regalo-rojo > g:nth-child(3){
+    --salida-x: 35px;
+    --inicio-producto: .55s;
+}
+
+.regalo.abierto .producto-regalo-rojo{
+    animation: salir-producto-regalo-rojo 2.4s ease-out var(--inicio-producto) infinite both;
+}
+
+@keyframes salir-producto-regalo-rojo{
+    0%{
+        opacity: 0;
+        transform: translateY(120px) scale(.4);
+    }
+    25%{
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+    65%{
+        opacity: 1;
+    }
+    100%{
+        opacity: 0;
+        transform: translate(var(--salida-x), -70px) scale(.75);
+    }
+}
+
+.zona-regalo-rojo{
+    z-index: 4;
+    overflow: visible;
+}
+
+.superficie-regalo-rojo{
+    fill: transparent;
+    pointer-events: all;
+    cursor: pointer;
+}
+
+.superficie-regalo-rojo:focus-visible{
+    stroke: white;
+    stroke-width: 3;
+}
+
+.regalo-sin-lazada,
+.lazada,
+.extremo-cinta{
+    opacity: 0;
+    pointer-events: none;
+}
+
+.regalo-sin-lazada{
+    background: white;
+}
+
+.lazada,
+.extremo-cinta{
+    position: absolute;
+    height: auto;
+}
+
+.lazada-opuesta{
+    top: 3.75%;
+    left: 18.095%;
+    width: 30%;
+    transform-origin: 95% 85%;
+}
+
+.extremo-cinta{
+    top: 21.5%;
+    left: 51.905%;
+    width: 27.619%;
+    transform-origin: left center;
+}
+
+.mensaje{
+    margin: 18px 0 0;
+    text-align: center;
+    font-size: 18px;
+}
+
+.escena-fecha{
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    width: 100%;
+    padding: var(--espaciado-cartel) var(--espaciado-cartel) 0;
+    overflow: hidden;
+    isolation: isolate;
+    background: #f5f0e5 url("images/pngtree-christmas-plantas-grandes.webp") center / 100% 100% no-repeat;
+    text-align: center;
+}
+
+.escena-fecha::before{
+    content: "";
+    grid-column: 1;
+    grid-row: 3;
+    aspect-ratio: 463 / 260;
+    min-height: 300px;
+    margin-bottom: 40px;
+}
+
+.escena-fecha::after{
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-color: transparent;
+    mask-image: linear-gradient(to bottom, rgba(0, 0, 0, .1), rgba(0, 0, 0, .22) 45%, #000);
+}
+
+.aurora-nieve{
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    opacity: 0;
+    pointer-events: none;
+    mix-blend-mode: screen;
+    background:
+        radial-gradient(ellipse 38% 20% at var(--aurora-x, 47%) var(--aurora-y, 25%), rgba(60, 248, 144, .4), transparent 70%),
+        linear-gradient(110deg,
+            transparent calc(var(--aurora-x, 47%) - 19%),
+            rgba(77, 255, 164, .22) calc(var(--aurora-x, 47%) - 11%),
+            transparent calc(var(--aurora-x, 47%) - 8%),
+            rgba(52, 220, 172, .2) calc(var(--aurora-x, 47%) - 2%),
+            transparent calc(var(--aurora-x, 47%) + 6%));
+    mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 40%, transparent 65%);
+}
+
+.efectos-cielo{
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+    mask-image: linear-gradient(to bottom, #000 45%, transparent 65%);
+}
+
+.destello-cielo{
+    position: absolute;
+    left: clamp(2%, calc(var(--aurora-x, 47%) + var(--desvio-x)), 98%);
+    top: clamp(2%, calc(var(--aurora-y, 25%) + var(--desvio-y)), 60%);
+    width: 14px;
+    height: 14px;
+    opacity: 0;
+    background: #fff6d8;
+    clip-path: polygon(50% 0, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0 50%, 40% 40%);
+}
+
+.destello-cielo:nth-child(1){
+    --desvio-x: -14%;
+    --desvio-y: -8%;
+    --retraso-destello: 0s;
+}
+
+.destello-cielo:nth-child(2){
+    --desvio-x: 12%;
+    --desvio-y: -4%;
+    --retraso-destello: .7s;
+}
+
+.destello-cielo:nth-child(3){
+    --desvio-x: -7%;
+    --desvio-y: 10%;
+    --retraso-destello: 1.4s;
+}
+
+.destello-cielo:nth-child(4){
+    --desvio-x: 17%;
+    --desvio-y: 8%;
+    --retraso-destello: 2.1s;
+}
+
+.estrella-fugaz{
+    position: absolute;
+    top: 10%;
+    right: 12%;
+    width: 80px;
+    height: 2px;
+    opacity: 0;
+    background: linear-gradient(to right, #fff7dd, transparent);
+    box-shadow: 0 0 6px #fff3be;
+    transform: rotate(-20deg);
+}
+
+body.puntero-raton .cartel:hover .escena-fecha::after{
+    animation: tonos-nieve 8s linear infinite;
+}
+
+body.puntero-raton .cartel:hover .aurora-nieve{
+    animation: aurora-nieve 8s linear infinite;
+}
+
+body.puntero-raton .cartel:hover .destello-cielo{
+    animation: destellar-cielo 2.8s ease-in-out var(--retraso-destello) infinite;
+}
+
+body.puntero-raton .cartel:hover .estrella-fugaz{
+    animation: cruzar-cielo 7s linear 1s infinite;
+}
+
+@keyframes destellar-cielo{
+    0%, 100%{ opacity: 0; transform: scale(.4); }
+    50%{ opacity: 1; transform: scale(1); }
+}
+
+@keyframes cruzar-cielo{
+    0%, 4%{ opacity: 0; transform: translate(0, 0) rotate(-20deg); }
+    6%{ opacity: 1; }
+    20%, 100%{
+        opacity: 0;
+        transform: translate(clamp(-120px, -15vw, -30px), 40px) rotate(-20deg);
+    }
+}
+
+@keyframes tonos-nieve{
+    0%, 100%{
+        background-color: transparent;
+    }
+    25%{
+        background-color: rgba(56, 158, 73, .55);
+    }
+    50%{
+        background-color: rgba(241, 204, 62, .5);
+    }
+    75%{
+        background-color: rgba(222, 108, 36, .5);
+    }
+}
+
+@keyframes aurora-nieve{
+    0%{
+        opacity: 0;
+        filter: blur(10px) hue-rotate(0deg);
+    }
+    25%{
+        opacity: 1;
+        filter: blur(10px) hue-rotate(0deg);
+    }
+    50%{
+        opacity: 1;
+        filter: blur(10px) hue-rotate(-90deg);
+    }
+    75%{
+        opacity: 1;
+        filter: blur(10px) hue-rotate(-120deg);
+    }
+    100%{
+        opacity: 0;
+        filter: blur(10px) hue-rotate(-120deg);
+    }
+}
+
+.fecha-gatos{
+    --separacion-lineas: 20px;
+    grid-column: 1;
+    grid-row: 3;
+    z-index: 1;
+    align-self: start;
+    width: min(100%, 368px);
+    margin: 32px auto 0;
+    pointer-events: none;
+}
+
+.linea-fecha{
+    display: flex;
+    justify-content: center;
+    gap: 1.3%;
+}
+
+.linea-fecha + .linea-fecha{
+    margin-top: var(--separacion-lineas);
+}
+
+.letra-gatos{
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    width: 9.7%;
+    flex: 0 0 9.7%;
+}
+
+.letra-gatos span{
+    aspect-ratio: 1;
+}
+
+.gato-fecha{
+    opacity: 1;
+    background: center / contain no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23ff0000' stroke='%238b0000' stroke-width='.8' d='M3 10 3 2 8 5a12 12 0 0 1 8 0l5-3v8c1 2 1 5 0 7-1 4-5 5-9 5s-8-1-9-5c-1-2-1-5 0-7Z'/%3E%3Cpath fill='%23dfc4e9' d='M5 6 5 4l2 2zm14 0-2 0 2-2z'/%3E%3Ccircle cx='8' cy='12' r='1' fill='white'/%3E%3Ccircle cx='16' cy='12' r='1' fill='white'/%3E%3Cpath d='M10 16q2 2 4 0' fill='none' stroke='white' stroke-width='1.2' stroke-linecap='round'/%3E%3C/svg%3E");
+    filter: drop-shadow(0 0 3px white);
+    transition: transform 1s cubic-bezier(.3, .05, .7, 1) var(--retraso);
+}
+
+body.puntero-raton .cartel:hover .gato-fecha{
+    transform: translate(var(--desvio), var(--caida));
+}
+
+.escena-fecha:focus .gato-fecha{
+    transform: translate(var(--desvio), var(--caida));
+}
+
+.regalos-nieve,
+.fondo-escena-regalo{
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.regalos-nieve{
+    z-index: 1;
+}
+
+.fondo-escena-regalo{
+    z-index: 0;
+    opacity: 0;
+}
+
+.escena-fecha.regalo-ampliado .fondo-escena-regalo{
+    opacity: 1;
+}
+
+.zona-regalo-nieve{
+    pointer-events: all;
+    cursor: pointer;
+}
+
+.regalo-nieve-adicional .zona-regalo-nieve{
+    pointer-events: none;
+}
+
+.regalo-nieve:focus-visible .zona-regalo-nieve{
+    stroke: white;
+    stroke-width: 2;
+}
+
+.foto-regalo-ampliado{
+    opacity: 0;
+    pointer-events: none;
+}
+
+.regalo-nieve-principal.ampliado .foto-regalo-ampliado{
+    opacity: 1;
+}
+
+.contenido-regalo-nieve{
+    transform-box: view-box;
+    transform-origin: 282px 469px;
+    transition: transform .35s ease;
+}
+
+.regalo-nieve-principal.ampliado .contenido-regalo-nieve{
+    transform: scale(1.35);
+}
+
+.regalo-nieve-principal{
+    --momento-abrir: 3.5s;
+    --duracion-tapa: 2s;
+    --duracion-vuelo: .8s;
+}
+
+.tapa-limpia{
+    opacity: 0;
+    pointer-events: none;
+}
+
+.regalo-nieve-principal.ampliado.desatando .foto-regalo-ampliado{
+    animation: recortar-lazo-foto 0s 2s forwards;
+}
+
+.regalo-nieve-principal.ampliado.desatando .tapa-limpia{
+    animation: mostrar-tapa-limpia 1.5s steps(1, end) 2s;
+}
+
+.fondo-lazo-nieve,
+.lazo-nieve,
+.cinta-suelta-nieve,
+.fondo-cinta-nieve,
+.cinta-regalo-nieve,
+.interior-regalo,
+.tapa-regalo,
+.objeto-navidad{
+    opacity: 0;
+    pointer-events: none;
+}
+
+.lazo-nieve{
+    transform-box: fill-box;
+    transform-origin: 95% 85%;
+}
+
+.lazo-nieve.segunda-lazada{
+    --giro-lazada: -5deg;
+    transform-origin: 5% 85%;
+}
+
+.cinta-suelta-nieve{
+    fill: none;
+    stroke: #ffe08a;
+    stroke-width: 1.4;
+    stroke-linecap: round;
+}
+
+.regalo-nieve.desatando .fondo-lazo-nieve{
+    animation: mostrar-fondo 1s linear forwards;
+}
+
+.regalo-nieve-principal.ampliado.desatando .fondo-lazo-nieve{
+    animation: mostrar-fondo 1s linear forwards, ocultar-fondo-lazo 0s 2s forwards;
+}
+
+.regalo-nieve-principal.ampliado.desatando .fondo-lazo-nieve.segunda-lazada{
+    animation-delay: 1s, 2s;
+}
+
+.regalo-nieve.desatando .lazo-nieve{
+    animation: desatar-lazada-nieve 1s ease-in-out forwards;
+}
+
+.regalo-nieve.desatando .cinta-suelta-nieve{
+    animation: mostrar-cinta-suelta-nieve 1s ease-in-out 1s forwards,
+        recoger-extremo-nieve 1.5s ease-in-out 2s forwards;
+}
+
+.regalo-nieve.desatando .segunda-lazada{
+    animation-delay: 1s;
+}
+
+.regalo-nieve.desatando .cinta-suelta-nieve.segunda-lazada{
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: desplegar-hilo-nieve 1s ease-in-out 1s forwards,
+        recoger-extremo-nieve 1.5s ease-in-out 2s forwards;
+    animation-delay: 1s, 2s;
+}
+
+.fondo-lazadas,
+.lazada-individual,
+.hilo-lazada-individual{
+    opacity: 0;
+    pointer-events: none;
+}
+
+.lazada-individual{
+    transform-box: view-box;
+    transform-origin: var(--origen-lazada);
+}
+
+.hilo-lazada-individual{
+    fill: none;
+    stroke: #ffe08a;
+    stroke-width: 1.4;
+    stroke-linecap: round;
+}
+
+.regalo-nieve.desatando .fondo-lazadas{
+    opacity: 1;
+}
+
+.regalo-nieve.desatando .lazada-individual{
+    animation: desatar-lazada-individual 2s ease-in-out var(--inicio-lazada) both;
+}
+
+.regalo-nieve.desatando .hilo-lazada-individual{
+    animation: mostrar-cinta-suelta-nieve 2s ease-in-out var(--inicio-hilo) forwards,
+        recoger-extremo-nieve 3s ease-in-out var(--fin-hilo) forwards;
+}
+
+.regalo-nieve.desatando .hilo-lazada-individual.ultimo-hilo{
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: desplegar-hilo-nieve 2s ease-in-out var(--inicio-hilo) forwards,
+        recoger-extremo-nieve 3s ease-in-out var(--fin-hilo) forwards;
+}
+
+.regalo-nieve.desatando .fondo-cinta-nieve{
+    animation: mostrar-fondo .9s linear 2.6s forwards;
+}
+
+.regalo-nieve.desatando .cinta-regalo-nieve{
+    animation: retirar-cinta-nieve .9s ease-in-out 2.6s forwards;
+}
+
+.tapa-regalo{
+    transform-box: fill-box;
+    transform-origin: 50% 80%;
+}
+
+.regalo-nieve.desatando .interior-regalo{
+    animation: mostrar-interior-regalo .3s linear var(--momento-abrir, 7s) forwards;
+}
+
+.regalo-nieve.desatando .tapa-regalo{
+    animation: abrir-tapa-regalo var(--duracion-tapa, 4s) linear var(--momento-abrir, 7s) forwards;
+}
+
+.objeto-navidad{
+    transform-box: fill-box;
+    transform-origin: center;
+}
+
+.estrella-navidad{
+    --vuelo-x: -65px;
+    --vuelo-y: -200px;
+    --giro-vuelo: -35deg;
+    --inicio-vuelo: 7.2s;
+    --reposo-x: -24px;
+    --reposo-y: -55px;
+}
+
+.bola-navidad{
+    --vuelo-x: -35px;
+    --vuelo-y: -235px;
+    --giro-vuelo: 30deg;
+    --inicio-vuelo: 7.35s;
+    --reposo-x: -10px;
+    --reposo-y: -78px;
+}
+
+.baston-navidad{
+    --vuelo-x: 70px;
+    --vuelo-y: -225px;
+    --giro-vuelo: 45deg;
+    --inicio-vuelo: 7.5s;
+    --reposo-x: 18px;
+    --reposo-y: -60px;
+}
+
+.arbol-navidad{
+    --vuelo-x: 145px;
+    --vuelo-y: -205px;
+    --giro-vuelo: -25deg;
+    --inicio-vuelo: 7.65s;
+    --reposo-x: 35px;
+    --reposo-y: -80px;
+}
+
+.campana-navidad{
+    --vuelo-x: 200px;
+    --vuelo-y: -170px;
+    --giro-vuelo: 35deg;
+    --inicio-vuelo: 7.8s;
+    --reposo-x: 53px;
+    --reposo-y: -52px;
+}
+
+.regalo-nieve-principal .estrella-navidad{ --inicio-vuelo: 3.6s; }
+.regalo-nieve-principal .bola-navidad{ --inicio-vuelo: 3.675s; }
+.regalo-nieve-principal .baston-navidad{ --inicio-vuelo: 3.75s; }
+.regalo-nieve-principal .arbol-navidad{ --inicio-vuelo: 3.825s; }
+.regalo-nieve-principal .campana-navidad{ --inicio-vuelo: 3.9s; }
+
+.objeto-navidad-copo{
+    --vuelo-x: -110px;
+    --vuelo-y: -220px;
+    --giro-vuelo: -45deg;
+    --inicio-vuelo: 7.2s;
+    --reposo-x: -45px;
+    --reposo-y: -100px;
+}
+
+.objeto-navidad-muneco{
+    --vuelo-x: -35px;
+    --vuelo-y: -240px;
+    --giro-vuelo: 30deg;
+    --inicio-vuelo: 7.35s;
+    --reposo-x: -15px;
+    --reposo-y: -110px;
+}
+
+.objeto-navidad-calcetin{
+    --vuelo-x: 120px;
+    --vuelo-y: -210px;
+    --giro-vuelo: 45deg;
+    --inicio-vuelo: 7.5s;
+    --reposo-x: 50px;
+    --reposo-y: -90px;
+}
+
+.objeto-navidad-pan{
+    --vuelo-x: 185px;
+    --vuelo-y: -170px;
+    --giro-vuelo: -30deg;
+    --inicio-vuelo: 7.65s;
+    --reposo-x: 80px;
+    --reposo-y: -70px;
+}
+
+.regalo-nieve.desatando .objeto-navidad{
+    animation: volar-objeto-navidad var(--duracion-vuelo, 1.6s) ease-out var(--inicio-vuelo) infinite;
+}
+
+@keyframes desatar-lazada-nieve{
+    0%{
+        opacity: 0;
+        transform: scale(1);
+    }
+    8%, 20%{
+        opacity: 1;
+        transform: scale(1);
+    }
+    90%{
+        opacity: 1;
+        transform: rotate(var(--giro-lazada, 5deg)) scale(.12, .75);
+    }
+    100%{
+        opacity: 0;
+        transform: rotate(var(--giro-lazada, 5deg)) scale(.02, .5);
+    }
+}
+
+@keyframes recortar-lazo-foto{
+    to{ clip-path: inset(41% 0 0); }
+}
+
+@keyframes mostrar-tapa-limpia{
+    from{ opacity: 1; }
+    to{ opacity: 0; }
+}
+
+@keyframes ocultar-fondo-lazo{
+    to{ opacity: 0; }
+}
+
+@keyframes desatar-lazada-individual{
+    0%, 20%{
+        opacity: 1;
+        transform: scale(1);
+    }
+    90%{
+        opacity: 1;
+        transform: rotate(var(--giro-lazada)) scale(.12, .75);
+    }
+    100%{
+        opacity: 0;
+        transform: rotate(var(--giro-lazada)) scale(.02, .5);
+    }
+}
+
+@keyframes mostrar-cinta-suelta-nieve{
+    0%, 20%{
+        opacity: 0;
+    }
+    90%, 100%{
+        opacity: .9;
+    }
+}
+
+@keyframes desplegar-hilo-nieve{
+    0%, 20%{
+        opacity: 0;
+        stroke-dashoffset: 1;
+    }
+    90%, 100%{
+        opacity: .9;
+        stroke-dashoffset: 0;
+    }
+}
+
+@keyframes retirar-cinta-nieve{
+    0%, 8%{
+        opacity: 1;
+        clip-path: inset(0);
+    }
+    100%{
+        opacity: 1;
+        clip-path: inset(100% 0 0 0);
+    }
+}
+
+@keyframes recoger-extremo-nieve{
+    0%{
+        opacity: .55;
+        transform: translateY(0);
+    }
+    100%{
+        opacity: 0;
+        transform: translateY(20px);
+    }
+}
+
+@keyframes mostrar-interior-regalo{
+    to{
+        opacity: 1;
+    }
+}
+
+@keyframes abrir-tapa-regalo{
+    0%{
+        opacity: 1;
+        transform: translate(0, 0) rotate(0);
+    }
+    25%{
+        opacity: 1;
+        transform: translate(-25px, -37.5px) rotate(0);
+    }
+    37.5%{
+        opacity: 1;
+        transform: translate(-37.5px, -56.25px) rotate(-20deg);
+    }
+    50%{
+        opacity: 1;
+        transform: translate(-50px, -75px) rotate(-40deg);
+    }
+    75%{
+        opacity: 1;
+        transform: translate(-100px, -75px) rotate(-253.333deg);
+    }
+    87.5%{
+        opacity: 1;
+        transform: translate(-125px, -50px) rotate(-360deg) scale(1);
+    }
+    100%{
+        opacity: 0;
+        transform: translate(-125px, -50px) rotate(-450deg) scale(0);
+    }
+}
+
+@keyframes volar-objeto-navidad{
+    0%{
+        opacity: 0;
+        transform: translate(0, 0) scale(.3);
+    }
+    20%, 80%{
+        opacity: 1;
+    }
+    100%{
+        opacity: 0;
+        transform: translate(var(--vuelo-x), var(--vuelo-y)) rotate(var(--giro-vuelo)) scale(1.05);
+    }
+}
+
+.nieve{
+    position: absolute;
+    z-index: 1;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.copo{
+    position: absolute;
+    top: -8px;
+    left: var(--posicion);
+    width: var(--tamano);
+    height: 100%;
+    opacity: .85;
+    animation: caer-nieve var(--duracion) linear var(--inicio) infinite paused;
+}
+
+.copo::before{
+    display: block;
+    width: var(--tamano);
+    height: var(--tamano);
+    border-radius: 50%;
+    background: white;
+    box-shadow: 0 0 4px white;
+    content: "";
+}
+
+body.puntero-raton .cartel:hover .copo{
+    animation-play-state: running;
+}
+
+.escena-fecha:focus .copo{
+    animation-play-state: running;
+}
+
+@keyframes caer-nieve{
+    to{
+        transform: translate(var(--deriva), 100%);
+    }
+}
+
+@keyframes mostrar-fondo{
+    0%{
+        opacity: 0;
+    }
+    8%, 100%{
+        opacity: 1;
+    }
+}
+
+@keyframes acortar-lazada{
+    0%{
+        transform: scale(1);
+        opacity: 0;
+    }
+    8%, 20%{
+        transform: scale(1);
+        opacity: 1;
+    }
+    50%{
+        transform: rotate(4deg) scale(.72, .9);
+    }
+    75%{
+        transform: rotate(8deg) scale(.4, .75);
+    }
+    95%, 100%{
+        transform: rotate(12deg) scale(.16, .6);
+        opacity: 1;
+    }
+}
+
+@keyframes tirar-extremo{
+    0%, 5%{
+        opacity: 0;
+        transform: scaleX(1);
+    }
+    12%, 20%{
+        opacity: 1;
+        transform: scaleX(1);
+    }
+    50%{
+        opacity: 1;
+        transform: rotate(2deg) scaleX(1.2);
+    }
+    95%, 100%{
+        opacity: 1;
+        transform: rotate(4deg) scaleX(1.55);
+    }
+}
+
+@media (prefers-reduced-motion: reduce){
+    body.puntero-raton:hover .bolas-navidad{
+        opacity: 0;
+    }
+
+    body.puntero-raton:hover .bola-roja,
+    body.puntero-raton:hover .bola-amarilla{
+        animation: none;
+    }
+
+    .titulo.siguiendo-cursor{
+        animation: none;
+    }
+
+    body.puntero-raton .cartel:hover .escena-fecha::after,
+    body.puntero-raton .cartel:hover .aurora-nieve,
+    body.puntero-raton .cartel:hover .destello-cielo,
+    body.puntero-raton .cartel:hover .estrella-fugaz{
+        animation: none;
+    }
+
+    .copo{
+        animation-play-state: paused !important;
+    }
+
+    .gato-fecha{
+        transition: none;
+    }
+
+    .contenido-regalo-nieve{
+        transition: none;
+    }
+
+    .regalo-nieve-principal.ampliado.desatando .foto-regalo-ampliado{
+        animation-delay: 0s;
+    }
+
+    .regalo-nieve-principal.ampliado.desatando .tapa-limpia{
+        animation: none;
+    }
+
+    .regalo-nieve-principal.ampliado.desatando .fondo-lazo-nieve,
+    .regalo-nieve-principal.ampliado.desatando .fondo-lazo-nieve.segunda-lazada{
+        animation-duration: .01ms;
+        animation-delay: 0s;
+    }
+
+    .regalo.abierto .tapa-regalo-rojo,
+    .regalo.abierto .lateral-tapa-regalo-rojo,
+    .regalo.abierto .retoque-tapa-regalo-rojo{
+        animation-duration: .01ms;
+    }
+
+    .regalo.abierto .producto-regalo-rojo{
+        animation: desvanecer-producto-regalo-rojo 2.4s linear var(--inicio-producto) infinite both;
+    }
+
+    .regalo-nieve.desatando .fondo-lazo-nieve,
+    .regalo-nieve.desatando .lazo-nieve,
+    .regalo-nieve.desatando .cinta-suelta-nieve,
+    .regalo-nieve.desatando .cinta-suelta-nieve.segunda-lazada,
+    .regalo-nieve.desatando .lazada-individual,
+    .regalo-nieve.desatando .hilo-lazada-individual,
+    .regalo-nieve.desatando .hilo-lazada-individual.ultimo-hilo,
+    .regalo-nieve.desatando .fondo-cinta-nieve,
+    .regalo-nieve.desatando .cinta-regalo-nieve,
+    .regalo-nieve.desatando .interior-regalo,
+    .regalo-nieve.desatando .tapa-regalo{
+        animation-duration: .01ms;
+        animation-delay: 0s;
+    }
+
+    @keyframes desvanecer-producto-regalo-rojo{
+        0%, 80%{ opacity: 1; }
+        100%{ opacity: 0; }
+    }
+
+    .regalo-nieve.desatando .objeto-navidad{
+        animation: none;
+        opacity: 1;
+        transform: translate(var(--reposo-x), var(--reposo-y));
+    }
+
+    .regalo-nieve.desatando .cinta-suelta-nieve,
+    .regalo-nieve.desatando .cinta-suelta-nieve.segunda-lazada{
+        animation-delay: 0s;
+    }
+
+}

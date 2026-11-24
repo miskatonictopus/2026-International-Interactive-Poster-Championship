@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ningún niño sin regalo · Fundación ITACA</title>
+  <link rel="stylesheet" href="fonts/fonts.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <main class="viewport">
+    <div class="poster-wrap" id="posterWrap">
+      <section class="poster" id="poster" aria-label="Cartel interactivo en 3D: Ningún niño sin regalo. 21 de diciembre, Fundación ITACA">
+
+        <!-- ===== Escena 3D (Three.js · WebGL) ===== -->
+        <canvas class="scene3d" id="scene3d" aria-hidden="true"></canvas>
+
+        <!-- ===== Capa de texto ===== -->
+        <div class="overlay">
+          <header class="topbar">Fundación ITACA · L'Hospitalet</header>
+
+          <!-- cabecera: el letrero de neón y la frase van juntos, como un solo bloque -->
+          <div class="hero">
+            <h1 class="headline" id="headline" aria-label="Ningún Niño Sin Regalo">
+              <span class="line">Ningún Niño</span>
+              <span class="line line--gold">Sin Regalo</span>
+            </h1>
+            <div class="message">
+              <p class="quote">Dentro de cada <span class="kw" data-fx="shake">regalo</span> hay una <em class="kw" data-fx="smile">sonrisa</em>.</p>
+            </div>
+          </div>
+
+          <div class="badge" id="badge" role="button" tabindex="0" aria-label="Dona 10 euros: regala un juguete">
+            <span class="badge-tails" aria-hidden="true"></span>
+            <svg class="badge-ring" id="badgeRing" viewBox="0 0 160 160" aria-hidden="true">
+              <defs><path id="ringPath" d="M80,80 m-62,0 a62,62 0 1,1 124,0 a62,62 0 1,1 -124,0"/></defs>
+              <text><textPath href="#ringPath">DONA ✦ REGALA ✦ ILUSIONA ✦ DONA ✦ REGALA ✦ ILUSIONA ✦</textPath></text>
+            </svg>
+            <div class="badge-core" id="badgeCore">
+              <span class="badge-big">10€</span>
+              <span class="badge-small">= 1 regalo</span>
+            </div>
+            <span class="badge-count" id="badgeCount" aria-live="polite"></span>
+          </div>
+
+          <div class="tooltip" id="tooltip"></div>
+
+          <footer class="footer">
+            <div class="f-date">
+              <p class="f-day"><span class="date-num" id="dateNum">21</span> <em>de diciembre</em></p>
+              <p class="f-sub">Campaña Juguete Solidario<br>#NingúnNiñoSinRegalo</p>
+            </div>
+
+            <div class="brand">
+              <img class="brand-itaca" id="logo" src="img/itaca-logo-morado.png" alt="Associació educativa Itaca">
+              <img class="brand-planeta" id="logoPlaneta" src="img/planetafp-logo.png" alt="Planeta FP">
+
+              <svg class="seal" id="seal" viewBox="0 0 100 100" width="66" height="66" aria-label="Sello Juguete Solidario">
+                <defs><path id="sealPath" d="M50,50 m-36,0 a36,36 0 1,1 72,0 a36,36 0 1,1 -72,0"/></defs>
+                <circle cx="50" cy="50" r="47" fill="#fbf7f0" stroke="#3a2a1e" stroke-width="2"/>
+                <circle cx="50" cy="50" r="26" fill="#c0262f"/>
+                <text font-size="9.6" font-family="Inter, Arial, sans-serif" font-weight="800" fill="#3a2a1e" letter-spacing="0.6">
+                  <textPath href="#sealPath">JUGUETE SOLIDARIO · NAVIDAD 2026 · </textPath>
+                </text>
+                <path d="M50,35 L54,46 L65,46 L56,53 L59,64 L50,57 L41,64 L44,53 L35,46 L46,46Z" fill="#e8b23a"/>
+              </svg>
+            </div>
+          </footer>
+        </div>
+
+        <!-- Cursor, viñeta y grano -->
+        <div class="vignette" aria-hidden="true"></div>
+        <div class="cursor" id="cursor" aria-hidden="true">
+          <svg viewBox="-20 -20 40 40">
+            <g stroke="#ffffff" stroke-width="2.4" stroke-linecap="round" fill="none">
+              <path d="M0,-17 V17 M-14.7,-8.5 L14.7,8.5 M-14.7,8.5 L14.7,-8.5"/>
+              <path d="M-4,-13 L0,-9 L4,-13 M-4,13 L0,9 L4,13"/>
+            </g>
+            <circle r="3.5" fill="#ffd27a"/>
+          </svg>
+        </div>
+        <div class="grain" aria-hidden="true"></div>
+        <div class="loading" id="loading">Preparando la escena…</div>
+      </section>
+    </div>
+  </main>
+
+  <script src="lib/three.min.js"></script>
+  <!-- three-mesh-bvh (MIT): acelera los rayos del cursor y de la física de los regalos -->
+  <script src="lib/three-mesh-bvh.js"></script>
+  <!-- Postprocesado oficial de Three.js r128: brillo de luces (bloom) y suavizado de bordes (FXAA) -->
+  <script src="lib/postprocessing/EffectComposer.js"></script>
+  <script src="lib/postprocessing/RenderPass.js"></script>
+  <script src="lib/postprocessing/ShaderPass.js"></script>
+  <script src="lib/postprocessing/CopyShader.js"></script>
+  <script src="lib/postprocessing/LuminosityHighPassShader.js"></script>
+  <script src="lib/postprocessing/UnrealBloomPass.js"></script>
+  <script src="lib/postprocessing/FXAAShader.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>
