@@ -6,28 +6,36 @@
   <title>Cartel Itaca</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..900&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap">
   <link rel="stylesheet" href="css/styles.css">
   <script type="importmap">
     { "imports": {
       "three": "https://cdn.jsdelivr.net/npm/three@0.187.0/build/three.module.js",
       "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.187.0/examples/jsm/",
-      "meshoptimizer/simplifier": "https://cdn.jsdelivr.net/npm/meshoptimizer@0.22.0/meshopt_simplifier.module.js"
+      "three/examples/jsm/": "https://cdn.jsdelivr.net/npm/three@0.187.0/examples/jsm/",
+      "postprocessing": "https://cdn.jsdelivr.net/npm/postprocessing@6.38.2/build/index.js",
+      "n8ao": "https://cdn.jsdelivr.net/npm/n8ao@1.10.1/dist/N8AO.js",
+      "@dimforge/rapier3d-compat": "https://cdn.jsdelivr.net/npm/@dimforge/rapier3d-compat@0.14.0/rapier.es.js"
     } }
   </script>
 </head>
 <body>
-  <div class="cartel cartel--flying" id="cartel">
-    <!-- Juguetes flotando (adaptación de "flying bananas" de pmndrs, licencia MIT) -->
-    <canvas id="toys-canvas"></canvas>
-    <div id="status" role="status">Cargando juguetes…</div>
+  <div class="cartel" id="cartel">
+    <!-- Fondo: bolas de Navidad (adaptación de "Christmas Baubles" de pmndrs, licencia MIT) -->
+    <canvas id="baubles-canvas"></canvas>
     <!-- Capa delantera (sobre el cartel): aquí irán textos e imágenes -->
     <div id="overlay">
-      <h1 class="overlay__title">loremi ispum</h1>
+      <h1 class="overlay__title">NINGÚN PEQUE</h1>
+      <p class="overlay__title">SIN REGALO</p>
+      <p class="overlay__title_2">21 de Diciembre</p>
+      <p class="overlay__title_3">Tu pequeña donación, su gran alegría</p>
+      <img class="overlay__duende" src="public/img/duende.png" alt="Bebé vestido de duende" width="1378" height="1390">
+      <img class="overlay__logo" src="public/img/planeta-fp.png" alt="Planeta FP" width="786" height="223">
+      <img class="overlay__logo-itaca" src="public/img/itaca.png" alt="Itaca, associació educativa" width="867" height="1200">
     </div>
   </div>
 
   <script src="js/main.js"></script>
-  <script type="module" src="js/flying-toys.js"></script>
+  <script type="module" src="js/baubles.js"></script>
 </body>
 </html>
