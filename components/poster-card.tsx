@@ -1,7 +1,8 @@
 "use client"
 
 import { Dialog } from "@base-ui/react/dialog"
-import { XIcon, ZoomInIcon } from "lucide-react"
+import { PlayIcon, XIcon, ZoomInIcon } from "lucide-react"
+import Image from "next/image"
 import { useState } from "react"
 
 import { PosterFrame } from "./poster-frame"
@@ -40,7 +41,29 @@ export function PosterCard({
     >
       <figure className="@container col-span-12 sm:col-span-6 lg:col-span-4 2xl:col-span-3">
         <div className="relative bg-white p-[10px] shadow-sm">
-          <PosterFrame src={src} title={title} />
+          {/*
+           * En la galería se muestra una captura estática: así ningún póster
+           * consume CPU/GPU hasta que se amplía. La versión interactiva solo
+           * se carga dentro del diálogo.
+           */}
+          <Dialog.Trigger
+            aria-label={`Ver el póster interactivo ${number} de ${author}`}
+            className="group relative block aspect-[848/1200] w-full cursor-pointer overflow-hidden bg-[#fafafa] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-950"
+          >
+            <Image
+              src={`/capturas/${id}.webp`}
+              alt={`Captura del póster ${number} de ${author}`}
+              width={640}
+              height={906}
+              sizes="(min-width: 1536px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+              unoptimized
+              className="block h-full w-full object-cover"
+            />
+            <span className="absolute inset-x-0 bottom-0 flex items-center justify-center gap-2 bg-neutral-950/75 py-2 text-sm font-semibold text-white opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
+              <PlayIcon aria-hidden="true" className="size-4" />
+              Ver interactivo
+            </span>
+          </Dialog.Trigger>
           <Dialog.Trigger
             aria-label={`Ampliar el póster ${number} de ${author}`}
             className="absolute -top-3 -right-3 flex size-9 cursor-pointer items-center justify-center rounded-full bg-white text-neutral-950 shadow-md transition-transform hover:scale-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-950"
