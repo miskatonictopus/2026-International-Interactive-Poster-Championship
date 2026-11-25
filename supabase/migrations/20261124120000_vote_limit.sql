@@ -13,9 +13,19 @@ revoke all on table public.votes_backup_20261124 from anon, authenticated;
 truncate table public.votes;
 
 -- 2. Cada votante es un usuario verificado de Supabase Auth.
-alter table public.votes
-  add constraint votes_voter_fkey
-  foreign key (voter) references auth.users (id) on delete cascade;
+-- (Idempotente: la migración se puede volver a ejecutar sin errores.)
+do $$
+begin
+  if not exists (
+    select 1 from pg_constraint
+    where conname = 'votes_voter_fkey' and conrelid = 'public.votes'::regclass
+  ) then
+    alter table public.votes
+      add constraint votes_voter_fkey
+      foreign key (voter) references auth.users (id) on delete cascade;
+  end if;
+end
+$$;
 
 -- 3. Máximo 3 pósters distintos por votante (cambiar una nota sí se permite).
 create or replace function public.enforce_vote_limit()
